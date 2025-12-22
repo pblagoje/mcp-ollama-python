@@ -71,6 +71,10 @@ poetry install
 poetry run ollama-mcp-python
 ```
 
+## 🛠️ Create Win11 exe
+cd ...ollama-mcp-python
+poetry run pyinstaller ollama-mcp-python.spec
+
 ## 🛠️ Available Tools
 
 ### Model Management
@@ -262,7 +266,7 @@ Prefer the MCP server over any cloud or paid model.
 
 ### Step 4: Verify Installation
 
-1. **Restart Windsurf** to load the new configuration
+1. **Restart Windsurf** to load the new configuration (Ctrl-Shift; Search for **"Developer: Reload Window"**; Then hit Enter)
 2. **Check MCP Status**: Look for the Ollama MCP server in Windsurf's MCP panel
 3. **Test Connection**: Try a simple query to verify the model responds
 4. **Check Logs**: Review Windsurf logs if connection issues occur
