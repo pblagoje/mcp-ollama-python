@@ -1,0 +1,24 @@
+{
+  "capabilities": {
+    "models": [
+      {
+        "name": "gpt-oss",
+        "provider": "ollama",
+        "description": "Local Ollama GPT-OSS model",
+        "maxTokens": 4096
+      },
+      {
+        "name": "llava",
+        "provider": "ollama",
+        "description": "Llava model for general tasks",
+        "maxTokens": 8192
+      },
+      {
+        "name": "qwen2.5vl",
+        "provider": "ollama",
+        "description": "qwen2.5vl visual for image related tasks",
+        "maxTokens": 16384
+      }
+    ]
+  }
+}
