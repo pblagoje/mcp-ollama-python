@@ -73,7 +73,7 @@ poetry run ollama-mcp-python
 
 ## 🛠️ Create Win11 exe
 cd ...ollama-mcp-python
-poetry run pyinstaller ollama-mcp-python.spec
+poetry run pyinstaller ollama-mcp-python.spec --clean --distpath bin
 
 ## 🛠️ Available Tools
 

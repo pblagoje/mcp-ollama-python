@@ -1,5 +1,6 @@
 ﻿# -*- mode: python ; coding: utf-8 -*-
-# pyinstaller ollama-mcp-python.spec --clean
+# from terminal/cli, run: poetry shell & pyinstaller ollama-mcp-python.spec --clean --distpath bin
+# or from poetry, run: poetry run pyinstaller ollama-mcp-python.spec --clean --distpath bin
 
 block_cipher = None
 
