@@ -14,6 +14,8 @@ try:
     from mcp.types import (
         TextContent,
         Tool as MCPTool,
+        Resource,
+        Prompt,
     )
     from mcp.server.stdio import stdio_server
 except ImportError as e:
@@ -94,6 +96,51 @@ async def main():
 
         return content
 
+    @mcp_server.list_resources()
+    async def handle_list_resources() -> list[Resource]:
+        """Handle list_resources request"""
+        result = await server.handle_list_resources()
+        resources = []
+        for resource_data in result["resources"]:
+            resources.append(
+                Resource(
+                    uri=resource_data["uri"],
+                    name=resource_data["name"],
+                    description=resource_data.get("description"),
+                    mimeType=resource_data.get("mimeType", "text/plain"),
+                )
+            )
+        return resources
+
+    @mcp_server.read_resource()
+    async def handle_read_resource(uri: str) -> str:
+        """Handle read_resource request"""
+        result = await server.handle_read_resource(uri)
+        if result.get("contents"):
+            return result["contents"][0].get("text", "")
+        return ""
+
+    @mcp_server.list_prompts()
+    async def handle_list_prompts() -> list[Prompt]:
+        """Handle list_prompts request"""
+        result = await server.handle_list_prompts()
+        prompts = []
+        for prompt_data in result["prompts"]:
+            prompts.append(
+                Prompt(
+                    name=prompt_data["name"],
+                    description=prompt_data.get("description"),
+                    arguments=prompt_data.get("arguments", []),
+                )
+            )
+        return prompts
+
+    @mcp_server.get_prompt()
+    async def handle_get_prompt(name: str, arguments: Optional[dict] = None) -> dict:
+        """Handle get_prompt request"""
+        result = await server.handle_get_prompt(name, arguments)
+        return result
+
     # Run the server with graceful shutdown support
     try:
         async with stdio_server() as (read_stream, write_stream):
@@ -138,7 +185,7 @@ async def main():
 
 
 def run():
-    """Entry point for the ollama-mcp-python command"""
+    """Entry point for the mcp-ollama-python command"""
     try:
         asyncio.run(main())
     except KeyboardInterrupt:

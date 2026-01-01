@@ -6,7 +6,7 @@ import sys
 import os
 import pytest
 
-# Package is installed, import from ollama_mcp_python
+# Package is installed, import from mcp_ollama_python
 
 
 class TestMainModuleStructure:
@@ -15,7 +15,7 @@ class TestMainModuleStructure:
     def test_main_module_imports(self):
         """Test that main module can be imported and has required components"""
         try:
-            from ollama_mcp_python import main
+            from mcp_ollama_python import main
             # Check main function exists
             assert hasattr(main, 'main')
             assert callable(main.main)
@@ -31,7 +31,7 @@ class TestMainModuleStructure:
     def test_main_is_async_function(self):
         """Test that main function is an async function"""
         try:
-            from ollama_mcp_python import main
+            from mcp_ollama_python import main
             import asyncio
             assert asyncio.iscoroutinefunction(main.main)
         except ImportError as e:
@@ -42,7 +42,7 @@ class TestMainModuleStructure:
     def test_run_is_sync_function(self):
         """Test that run function is a regular sync function"""
         try:
-            from ollama_mcp_python import main
+            from mcp_ollama_python import main
             import asyncio
             # run() should be a sync function that calls asyncio.run()
             assert not asyncio.iscoroutinefunction(main.run)
@@ -58,7 +58,7 @@ class TestMainModuleDependencies:
     def test_ollama_client_imported(self):
         """Test OllamaClient is imported in main"""
         try:
-            from ollama_mcp_python import main
+            from mcp_ollama_python import main
             # The import happens at module level
             assert 'OllamaClient' in dir(main) or hasattr(main, 'OllamaClient')
         except ImportError as e:
@@ -69,7 +69,7 @@ class TestMainModuleDependencies:
     def test_server_imported(self):
         """Test OllamaMCPServer is imported in main"""
         try:
-            from ollama_mcp_python import main
+            from mcp_ollama_python import main
             assert 'OllamaMCPServer' in dir(main) or hasattr(main, 'OllamaMCPServer')
         except ImportError as e:
             if 'mcp' in str(e).lower():

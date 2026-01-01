@@ -49,13 +49,13 @@ This Python implementation provides the same functionality as the TypeScript ver
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd ollama-mcp-python
+cd mcp-ollama-python
 
 # Install dependencies
 py -m poetry install
 
 # Run the server
-py -m poetry run ollama-mcp-python
+py -m poetry run mcp-ollama-python
 ```
 
 ### Manual Installation
@@ -66,14 +66,14 @@ curl -sSL https://install.python-poetry.org | python3 -
 
 # Clone and install
 git clone <repository-url>
-cd ollama-mcp-python
+cd mcp-ollama-python
 poetry install
-poetry run ollama-mcp-python
+poetry run mcp-ollama-python
 ```
 
 ## 🛠️ Create Win11 exe
-cd ...ollama-mcp-python
-poetry run pyinstaller ollama-mcp-python.spec --clean --distpath bin
+cd ...mcp-ollama-python
+poetry run pyinstaller mcp-ollama-python.spec --clean --distpath bin
 
 ## 🛠️ Available Tools
 
@@ -112,7 +112,7 @@ poetry run pyinstaller ollama-mcp-python.spec --clean --distpath bin
 
 ```bash
 export OLLAMA_HOST="http://localhost:11434"
-py -m poetry run ollama-mcp-python
+py -m poetry run mcp-ollama-python
 ```
 
 ### Ollama Cloud Configuration (Planned)
@@ -120,14 +120,14 @@ py -m poetry run ollama-mcp-python
 ```bash
 export OLLAMA_HOST="https://ollama.com"
 export OLLAMA_API_KEY="your-ollama-cloud-api-key"
-py -m poetry run ollama-mcp-python
+py -m poetry run mcp-ollama-python
 ```
 
 ### MCP Model Configuration
 
 The server exposes local Ollama models through MCP. Configure available models in `mcp.json`:
 
-**`ollama-mcp-python/mcp.json`**
+**`mcp-ollama-python/mcp.json`**
 ```json
 {
   "capabilities": {
@@ -194,7 +194,7 @@ Add the Ollama MCP server to your Windsurf MCP configuration:
   "mcpServers": {
     "ollama": {
       "command": "py",
-      "args": ["-m", "ollama_mcp_python"],
+      "args": ["-m", "mcp_ollama_python"],
       "disabled": false,
       "env": {}
     },
@@ -220,8 +220,8 @@ Add the Ollama MCP server to your Windsurf MCP configuration:
   "mcpServers": {
     "ollama": {
       "command": "py",
-      "args": ["-m", "poetry", "run", "ollama-mcp-python"],
-      "cwd": "d:/path/to/ollama-mcp-python",
+      "args": ["-m", "poetry", "run", "mcp-ollama-python"],
+      "cwd": "d:/path/to/mcp-ollama-python",
       "disabled": false,
       "env": {}
     }
@@ -300,7 +300,7 @@ Add to your VS Code MCP settings:
   "mcpServers": {
     "ollama": {
       "command": "py",
-      "args": ["-m", "ollama_mcp_python"],
+      "args": ["-m", "mcp_ollama_python"],
       "disabled": false
     }
   }
@@ -365,13 +365,13 @@ src/
 ```bash
 # Clone repository
 git clone <repository-url>
-cd ollama-mcp-python
+cd mcp-ollama-python
 
 # Install dependencies
 py -m poetry install
 
 # Run in development mode
-py -m poetry run ollama-mcp-python
+py -m poetry run mcp-ollama-python
 
 # Run tests (when implemented)
 py -m poetry run pytest

@@ -7,14 +7,14 @@ import os
 import json
 import pytest
 
-# Package is installed, import from ollama_mcp_python
-from ollama_mcp_python.response_formatter import (
+# Package is installed, import from mcp_ollama_python
+from mcp_ollama_python.response_formatter import (
     format_response,
     json_to_markdown,
     array_to_markdown_table,
     _format_object_entry
 )
-from ollama_mcp_python.models import ResponseFormat
+from mcp_ollama_python.models import ResponseFormat
 
 
 class TestFormatResponse:

@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "ollama-mcp-python"
-version = "0.2.0"
+name = "mcp-ollama-python"
+version = "0.2.1"
 description = "Model Context Protocol server that proxies local Ollama to MCP clients like Windsurf and VS Code"
 authors = ["Your Name <your.email@example.com>"]
 readme = "README.md"
-packages = [{include = "ollama_mcp_python", from = "src"}]
+packages = [{include = "mcp_ollama_python", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -15,7 +15,7 @@ mcp = "^1.0.0"
 psutil = "^7.1.3"
 
 [tool.poetry.scripts]
-ollama-mcp-python = "ollama_mcp_python.main:run"
+mcp-ollama-python = "mcp_ollama_python.main:run"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

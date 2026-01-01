@@ -42,7 +42,7 @@ async def discover_tools_with_handlers() -> ToolRegistry:
     registry = ToolRegistry()
 
     # Get the tools package path
-    tools_package = importlib.import_module('.tools', package='ollama_mcp_python')
+    tools_package = importlib.import_module('.tools', package='mcp_ollama_python')
 
     # Get the directory path
     if hasattr(tools_package, '__path__'):
@@ -58,7 +58,7 @@ async def discover_tools_with_handlers() -> ToolRegistry:
 
         try:
             # Import the module
-            module = importlib.import_module(f'.tools.{module_name}', package='ollama_mcp_python')
+            module = importlib.import_module(f'.tools.{module_name}', package='mcp_ollama_python')
 
             # Check if module exports tool_definition
             if hasattr(module, 'tool_definition'):

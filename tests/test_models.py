@@ -6,8 +6,8 @@ import sys
 import os
 import pytest
 
-# Package is installed, import from ollama_mcp_python
-from ollama_mcp_python.models import (
+# Package is installed, import from mcp_ollama_python
+from mcp_ollama_python.models import (
     ResponseFormat,
     GenerationOptions,
     MessageRole,

@@ -28,10 +28,10 @@ Run the server directly (blocks terminal):
 
 ```bash
 # Using Poetry
-py -m poetry run ollama-mcp-python
+py -m poetry run mcp-ollama-python
 
 # Or directly with Python
-python -m ollama_mcp_python
+python -m mcp_ollama_python
 
 # Stop with Ctrl+C
 ```
@@ -41,7 +41,7 @@ python -m ollama_mcp_python
 Control the server from Python code:
 
 ```python
-from ollama_mcp_python.main import run, stop
+from mcp_ollama_python.main import run, stop
 import threading
 
 # Start server in background thread
@@ -115,8 +115,8 @@ Add to your Windsurf MCP settings (`.windsurf/mcp_config.json`):
   "mcpServers": {
     "ollama": {
       "command": "py",
-      "args": ["-m", "poetry", "run", "ollama-mcp-python"],
-      "cwd": "D:/Pdj/gitHub/ollama-mcp-python"
+      "args": ["-m", "poetry", "run", "mcp-ollama-python"],
+      "cwd": "D:/Pdj/gitHub/mcp-ollama-python"
     }
   }
 }
@@ -152,7 +152,7 @@ The server uses stdio, not ports, so this shouldn't be an issue.
 **Force stop:**
 ```bash
 # Find the process
-ps aux | grep ollama-mcp-python
+ps aux | grep mcp-ollama-python
 
 # Kill it (replace PID)
 kill -9 <PID>
@@ -189,8 +189,8 @@ After=network.target
 [Service]
 Type=simple
 User=your-user
-WorkingDirectory=/path/to/ollama-mcp-python
-ExecStart=/usr/bin/python3 -m ollama_mcp_python
+WorkingDirectory=/path/to/mcp-ollama-python
+ExecStart=/usr/bin/python3 -m mcp_ollama_python
 Restart=on-failure
 RestartSec=5
 
@@ -212,8 +212,8 @@ sudo systemctl status ollama-mcp.service
 # Download from https://nssm.cc/
 
 # Install service
-nssm install OllamaMCP "C:\Python\python.exe" "-m ollama_mcp_python"
-nssm set OllamaMCP AppDirectory "D:\Pdj\gitHub\ollama-mcp-python"
+nssm install OllamaMCP "C:\Python\python.exe" "-m mcp_ollama_python"
+nssm set OllamaMCP AppDirectory "D:\Pdj\gitHub\mcp-ollama-python"
 nssm start OllamaMCP
 ```
 
@@ -237,7 +237,7 @@ Redirect output to log file:
 
 ```bash
 # Start with logging
-python -m ollama_mcp_python > server.log 2>&1 &
+python -m mcp_ollama_python > server.log 2>&1 &
 
 # View logs
 tail -f server.log

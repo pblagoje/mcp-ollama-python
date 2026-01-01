@@ -5,7 +5,7 @@
             "name": "Python: Run Ollama MCP Server",
             "type": "debugpy",
             "request": "launch",
-            "module": "ollama_mcp_python",
+            "module": "mcp_ollama_python",
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "justMyCode": true,
@@ -26,7 +26,7 @@
             "name": "Python: Run main.py",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/src/ollama_mcp_python/main.py",
+            "program": "${workspaceFolder}/src/mcp_ollama_python/main.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}"

@@ -1,5 +1,5 @@
 """
-Pytest configuration and shared fixtures for ollama-mcp-python tests
+Pytest configuration and shared fixtures for mcp-ollama-python tests
 """
 
 import sys

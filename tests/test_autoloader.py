@@ -5,8 +5,8 @@ import sys
 import os
 import pytest
 
-# Package is installed, import from ollama_mcp_python
-from ollama_mcp_python.models import ToolDefinition
+# Package is installed, import from mcp_ollama_python
+from mcp_ollama_python.models import ToolDefinition
 
 
 class TestToolDefinitionValidation:
@@ -52,7 +52,7 @@ class TestToolHandlerType:
 
     def test_tool_handler_type_exists(self):
         """Test ToolHandler type is defined"""
-        from ollama_mcp_python.autoloader import ToolHandler
+        from mcp_ollama_python.autoloader import ToolHandler
         assert ToolHandler is not None
 
 
@@ -61,13 +61,13 @@ class TestAutoloaderModuleImports:
 
     def test_discover_tools_is_async(self):
         """Test discover_tools is an async function"""
-        from ollama_mcp_python.autoloader import discover_tools
+        from mcp_ollama_python.autoloader import discover_tools
         import asyncio
         assert asyncio.iscoroutinefunction(discover_tools)
 
     def test_autoloader_imports(self):
         """Test autoloader imports required modules"""
-        from ollama_mcp_python import autoloader
+        from mcp_ollama_python import autoloader
         assert hasattr(autoloader, 'discover_tools')
         assert hasattr(autoloader, 'ToolHandler')
 
@@ -79,7 +79,7 @@ class TestAutoloaderIntegration:
     async def test_real_tools_directory_discovery(self):
         """Test discovery against the real tools directory if it exists"""
         try:
-            from ollama_mcp_python.autoloader import discover_tools
+            from mcp_ollama_python.autoloader import discover_tools
             
             # This will test against the actual tools directory
             result = await discover_tools()

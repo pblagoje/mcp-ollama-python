@@ -35,9 +35,9 @@ def is_mcp_server_process(pid: int) -> bool:
         if not cmdline:
             return False
         
-        # Look for Python executable and ollama_mcp_python module
+        # Look for Python executable and mcp_ollama_python module
         cmdline_str = ' '.join(cmdline).lower()
-        return 'python' in cmdline_str and 'ollama_mcp_python' in cmdline_str
+        return 'python' in cmdline_str and 'mcp_ollama_python' in cmdline_str
     except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
         return False
 
@@ -111,7 +111,7 @@ def start_server():
     # Start server as subprocess
     try:
         process = subprocess.Popen(
-            [sys.executable, "-m", "ollama_mcp_python"],
+            [sys.executable, "-m", "mcp_ollama_python"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             start_new_session=True

@@ -21,11 +21,11 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 try:
-    from ollama_mcp_python.server import OllamaMCPServer
-    from ollama_mcp_python.ollama_client import OllamaClient
-    from ollama_mcp_python.models import ResponseFormat  # noqa: F401
+    from mcp_ollama_python.server import OllamaMCPServer
+    from mcp_ollama_python.ollama_client import OllamaClient
+    from mcp_ollama_python.models import ResponseFormat  # noqa: F401
 except ImportError:
-    print("Error: Could not import ollama_mcp_python modules")
+    print("Error: Could not import mcp_ollama_python modules")
     print("Make sure you're running from the project root directory")
     sys.exit(1)
 
@@ -59,15 +59,15 @@ def is_mcp_server_process(pid: int) -> bool:
         if not cmdline:
             return False
 
-        # Look for Python executable and ollama_mcp_python module
+        # Look for Python executable and mcp_ollama_python module
         cmdline_str = ' '.join(cmdline).lower()
 
         # Check for various patterns that indicate this is our MCP server:
-        # 1. Direct python -m ollama_mcp_python
-        # 2. poetry run python -m ollama_mcp_python
-        # 3. Any python process with ollama_mcp_python in the command line
+        # 1. Direct python -m mcp_ollama_python
+        # 2. poetry run python -m mcp_ollama_python
+        # 3. Any python process with mcp_ollama_python in the command line
         is_python = 'python' in cmdline_str or 'python.exe' in cmdline_str
-        is_mcp = 'ollama_mcp_python' in cmdline_str or 'ollama-mcp-python' in cmdline_str
+        is_mcp = 'mcp_ollama_python' in cmdline_str or 'mcp-ollama-python' in cmdline_str
 
         # Also check if it's a poetry process that's running our module
         is_poetry_wrapper = 'poetry' in cmdline_str and is_mcp
@@ -284,11 +284,11 @@ class MCPInteractive:
                 return
             
             print(f"  Using Python: {venv_python}")
-            print(f"  Command: {venv_python} -m ollama_mcp_python")
+            print(f"  Command: {venv_python} -m mcp_ollama_python")
             
             # Run the module directly without -I flag to ensure proper package imports
             process = subprocess.Popen(
-                [str(venv_python), "-m", "ollama_mcp_python"],
+                [str(venv_python), "-m", "mcp_ollama_python"],
                 stdin=stdin_read,
                 stdout=log_file,
                 stderr=error_log_file,
@@ -403,7 +403,7 @@ class MCPInteractive:
         
         try:
             # Create temporary server instance to discover tools
-            from ollama_mcp_python.autoloader import discover_tools_with_handlers
+            from mcp_ollama_python.autoloader import discover_tools_with_handlers
             
             async def get_tools():
                 registry = await discover_tools_with_handlers()

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Test runner for ollama-mcp-python
+Test runner for mcp-ollama-python
 
 Usage:
     python run_tests.py              # Run all tests
@@ -63,7 +63,7 @@ def main():
         subprocess.run([sys.executable, "-m", "pip", "install", "pytest-asyncio"])
     
     print(f"\n{'='*60}")
-    print("Running ollama-mcp-python tests")
+    print("Running mcp-ollama-python tests")
     print(f"{'='*60}")
     print(f"Tests directory: {tests_dir}")
     print(f"Source directory: {src_dir}")

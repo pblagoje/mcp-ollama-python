@@ -1,3 +1,3 @@
 """
-Tests package for ollama-mcp-python
+Tests package for mcp-ollama-python
 """

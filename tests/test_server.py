@@ -8,8 +8,8 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 import json
 
-# Package is installed, import from ollama_mcp_python
-from ollama_mcp_python.models import ResponseFormat, ToolDefinition
+# Package is installed, import from mcp_ollama_python
+from mcp_ollama_python.models import ResponseFormat, ToolDefinition
 
 
 class TestOllamaMCPServerInit:
@@ -17,11 +17,11 @@ class TestOllamaMCPServerInit:
 
     def test_default_initialization(self):
         """Test default initialization creates OllamaClient"""
-        with patch('ollama_mcp_python.server.OllamaClient') as mock_client_class:
+        with patch('mcp_ollama_python.server.OllamaClient') as mock_client_class:
             mock_client = MagicMock()
             mock_client_class.return_value = mock_client
             
-            from ollama_mcp_python.server import OllamaMCPServer
+            from mcp_ollama_python.server import OllamaMCPServer
             server = OllamaMCPServer()
             
             assert server.ollama_client is not None
@@ -30,7 +30,7 @@ class TestOllamaMCPServerInit:
         """Test initialization with custom client"""
         mock_client = MagicMock()
         
-        from ollama_mcp_python.server import OllamaMCPServer
+        from mcp_ollama_python.server import OllamaMCPServer
         server = OllamaMCPServer(ollama_client=mock_client)
         
         assert server.ollama_client == mock_client
@@ -44,10 +44,10 @@ class TestHandleListTools:
         """Test that list_tools returns discovered tools"""
         mock_tool = ToolDefinition(**sample_tool_definition)
         
-        with patch('ollama_mcp_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
+        with patch('mcp_ollama_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
             mock_discover.return_value = [mock_tool]
             
-            from ollama_mcp_python.server import OllamaMCPServer
+            from mcp_ollama_python.server import OllamaMCPServer
             server = OllamaMCPServer(ollama_client=MagicMock())
             result = await server.handle_list_tools()
             
@@ -59,10 +59,10 @@ class TestHandleListTools:
     @pytest.mark.asyncio
     async def test_list_tools_empty(self):
         """Test list_tools with no tools discovered"""
-        with patch('ollama_mcp_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
+        with patch('mcp_ollama_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
             mock_discover.return_value = []
             
-            from ollama_mcp_python.server import OllamaMCPServer
+            from mcp_ollama_python.server import OllamaMCPServer
             server = OllamaMCPServer(ollama_client=MagicMock())
             result = await server.handle_list_tools()
             
@@ -77,10 +77,10 @@ class TestHandleListTools:
             ToolDefinition(name="tool3", description="Third tool", input_schema={})
         ]
         
-        with patch('ollama_mcp_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
+        with patch('mcp_ollama_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
             mock_discover.return_value = tools
             
-            from ollama_mcp_python.server import OllamaMCPServer
+            from mcp_ollama_python.server import OllamaMCPServer
             server = OllamaMCPServer(ollama_client=MagicMock())
             result = await server.handle_list_tools()
             
@@ -93,10 +93,10 @@ class TestHandleCallTool:
     @pytest.mark.asyncio
     async def test_call_unknown_tool(self):
         """Test calling an unknown tool returns error"""
-        with patch('ollama_mcp_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
+        with patch('mcp_ollama_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
             mock_discover.return_value = []
             
-            from ollama_mcp_python.server import OllamaMCPServer
+            from mcp_ollama_python.server import OllamaMCPServer
             server = OllamaMCPServer(ollama_client=MagicMock())
             result = await server.handle_call_tool("nonexistent_tool", {})
             
@@ -115,10 +115,10 @@ class TestHandleCallTool:
         mock_client = AsyncMock()
         mock_client.list = AsyncMock(return_value=json.dumps(mock_ollama_response_list))
         
-        with patch('ollama_mcp_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
+        with patch('mcp_ollama_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
             mock_discover.return_value = [tool]
             
-            from ollama_mcp_python.server import OllamaMCPServer
+            from mcp_ollama_python.server import OllamaMCPServer
             server = OllamaMCPServer(ollama_client=mock_client)
             result = await server.handle_call_tool("ollama_list", {})
             
@@ -138,10 +138,10 @@ class TestHandleCallTool:
         mock_client = AsyncMock()
         mock_client.list = AsyncMock(return_value=json.dumps(mock_ollama_response_list))
         
-        with patch('ollama_mcp_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
+        with patch('mcp_ollama_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
             mock_discover.return_value = [tool]
             
-            from ollama_mcp_python.server import OllamaMCPServer
+            from mcp_ollama_python.server import OllamaMCPServer
             server = OllamaMCPServer(ollama_client=mock_client)
             result = await server.handle_call_tool("ollama_list", {"format": "markdown"})
             
@@ -159,10 +159,10 @@ class TestHandleCallTool:
         mock_client = AsyncMock()
         mock_client.list = AsyncMock(side_effect=Exception("Connection failed"))
         
-        with patch('ollama_mcp_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
+        with patch('mcp_ollama_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
             mock_discover.return_value = [tool]
             
-            from ollama_mcp_python.server import OllamaMCPServer
+            from mcp_ollama_python.server import OllamaMCPServer
             server = OllamaMCPServer(ollama_client=mock_client)
             result = await server.handle_call_tool("ollama_list", {})
             
@@ -180,7 +180,7 @@ class TestToolHandlers:
         # format_response expects JSON string, not dict
         mock_client.list = AsyncMock(return_value=json.dumps(mock_ollama_response_list))
         
-        from ollama_mcp_python.server import OllamaMCPServer
+        from mcp_ollama_python.server import OllamaMCPServer
         server = OllamaMCPServer(ollama_client=mock_client)
         result = await server._handle_list_models(ResponseFormat.JSON)
         
@@ -194,7 +194,7 @@ class TestToolHandlers:
         mock_client = AsyncMock()
         mock_client.show = AsyncMock(return_value=json.dumps(mock_ollama_response_show))
         
-        from ollama_mcp_python.server import OllamaMCPServer
+        from mcp_ollama_python.server import OllamaMCPServer
         server = OllamaMCPServer(ollama_client=mock_client)
         result = await server._handle_show_model(
             {"model": "llama3.1:latest"}, 
@@ -206,7 +206,7 @@ class TestToolHandlers:
     @pytest.mark.asyncio
     async def test_handle_show_model_missing_name(self):
         """Test _handle_show_model raises error for missing model name"""
-        from ollama_mcp_python.server import OllamaMCPServer
+        from mcp_ollama_python.server import OllamaMCPServer
         server = OllamaMCPServer(ollama_client=MagicMock())
         
         with pytest.raises(ValueError) as exc_info:
@@ -220,7 +220,7 @@ class TestToolHandlers:
         mock_client = AsyncMock()
         mock_client.generate = AsyncMock(return_value=json.dumps(mock_ollama_response_generate))
         
-        from ollama_mcp_python.server import OllamaMCPServer
+        from mcp_ollama_python.server import OllamaMCPServer
         server = OllamaMCPServer(ollama_client=mock_client)
         result = await server._handle_generate(
             {"model": "llama3.1", "prompt": "Hello"},
@@ -232,7 +232,7 @@ class TestToolHandlers:
     @pytest.mark.asyncio
     async def test_handle_generate_missing_model(self):
         """Test _handle_generate raises error for missing model"""
-        from ollama_mcp_python.server import OllamaMCPServer
+        from mcp_ollama_python.server import OllamaMCPServer
         server = OllamaMCPServer(ollama_client=MagicMock())
         
         with pytest.raises(ValueError) as exc_info:
@@ -243,7 +243,7 @@ class TestToolHandlers:
     @pytest.mark.asyncio
     async def test_handle_generate_missing_prompt(self):
         """Test _handle_generate raises error for missing prompt"""
-        from ollama_mcp_python.server import OllamaMCPServer
+        from mcp_ollama_python.server import OllamaMCPServer
         server = OllamaMCPServer(ollama_client=MagicMock())
         
         with pytest.raises(ValueError) as exc_info:
@@ -257,7 +257,7 @@ class TestToolHandlers:
         mock_client = AsyncMock()
         mock_client.chat = AsyncMock(return_value=json.dumps(mock_ollama_response_chat))
         
-        from ollama_mcp_python.server import OllamaMCPServer
+        from mcp_ollama_python.server import OllamaMCPServer
         server = OllamaMCPServer(ollama_client=mock_client)
         result = await server._handle_chat(
             {
@@ -272,7 +272,7 @@ class TestToolHandlers:
     @pytest.mark.asyncio
     async def test_handle_chat_missing_messages(self):
         """Test _handle_chat raises error for missing messages"""
-        from ollama_mcp_python.server import OllamaMCPServer
+        from mcp_ollama_python.server import OllamaMCPServer
         server = OllamaMCPServer(ollama_client=MagicMock())
         
         with pytest.raises(ValueError) as exc_info:
@@ -286,7 +286,7 @@ class TestToolHandlers:
         mock_client = AsyncMock()
         mock_client.pull = AsyncMock(return_value='{"status": "success"}')
         
-        from ollama_mcp_python.server import OllamaMCPServer
+        from mcp_ollama_python.server import OllamaMCPServer
         server = OllamaMCPServer(ollama_client=mock_client)
         result = await server._handle_pull_model(
             {"model": "llama3.1"},
@@ -301,7 +301,7 @@ class TestToolHandlers:
         mock_client = AsyncMock()
         mock_client.delete = AsyncMock(return_value='{"status": "success"}')
         
-        from ollama_mcp_python.server import OllamaMCPServer
+        from mcp_ollama_python.server import OllamaMCPServer
         server = OllamaMCPServer(ollama_client=mock_client)
         result = await server._handle_delete_model(
             {"model": "old-model"},
@@ -316,7 +316,7 @@ class TestToolHandlers:
         mock_client = AsyncMock()
         mock_client.ps = AsyncMock(return_value=json.dumps(mock_ollama_response_ps))
         
-        from ollama_mcp_python.server import OllamaMCPServer
+        from mcp_ollama_python.server import OllamaMCPServer
         server = OllamaMCPServer(ollama_client=mock_client)
         result = await server._handle_ps(ResponseFormat.JSON)
         
@@ -335,7 +335,7 @@ class TestExecuteToolHandler:
             input_schema={}
         )
         
-        from ollama_mcp_python.server import OllamaMCPServer
+        from mcp_ollama_python.server import OllamaMCPServer
         server = OllamaMCPServer(ollama_client=MagicMock())
         
         with pytest.raises(ValueError) as exc_info:
@@ -355,7 +355,7 @@ class TestExecuteToolHandler:
         mock_client = AsyncMock()
         mock_client.list = AsyncMock(return_value=json.dumps(mock_ollama_response_list))
         
-        from ollama_mcp_python.server import OllamaMCPServer
+        from mcp_ollama_python.server import OllamaMCPServer
         server = OllamaMCPServer(ollama_client=mock_client)
         result = await server._execute_tool_handler(tool, {}, ResponseFormat.JSON)
         
@@ -381,10 +381,10 @@ class TestIntegration:
         mock_client = AsyncMock()
         mock_client.list = AsyncMock(return_value=json.dumps(mock_ollama_response_list))
         
-        with patch('ollama_mcp_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
+        with patch('mcp_ollama_python.server.discover_tools', new_callable=AsyncMock) as mock_discover:
             mock_discover.return_value = tools
             
-            from ollama_mcp_python.server import OllamaMCPServer
+            from mcp_ollama_python.server import OllamaMCPServer
             server = OllamaMCPServer(ollama_client=mock_client)
             
             # List tools
