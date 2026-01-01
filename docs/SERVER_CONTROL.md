@@ -167,10 +167,10 @@ If the control script reports a running server but it's not actually running:
 
 ```bash
 # Remove the PID file
-rm .ollama_mcp_server.pid
+rm .mcp_ollama_server.pid
 
 # Or on Windows
-del .ollama_mcp_server.pid
+del .mcp_ollama_server.pid
 ```
 
 ## Advanced Usage
@@ -179,7 +179,7 @@ del .ollama_mcp_server.pid
 
 **Linux (systemd):**
 
-Create `/etc/systemd/system/ollama-mcp.service`:
+Create `/etc/systemd/system/mcp-ollama.service`:
 
 ```ini
 [Unit]
@@ -200,9 +200,9 @@ WantedBy=multi-user.target
 
 Enable and start:
 ```bash
-sudo systemctl enable ollama-mcp.service
-sudo systemctl start ollama-mcp.service
-sudo systemctl status ollama-mcp.service
+sudo systemctl enable mcp-ollama.service
+sudo systemctl start mcp-ollama.service
+sudo systemctl status mcp-ollama.service
 ```
 
 **Windows (NSSM):**

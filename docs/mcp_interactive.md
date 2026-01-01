@@ -142,7 +142,7 @@ Displays comprehensive server and Ollama connection information:
 SERVER STATUS
 ============================================================
 ✓ Server is RUNNING (PID: 12345)
-  PID File: D:\Pdj\gitHub\mcp-ollama-python\tmp\.ollama_mcp_server.pid
+  PID File: D:\Pdj\gitHub\mcp-ollama-python\tmp\.mcp_ollama_server.pid
 
 Ollama Connection:
   Host: http://127.0.0.1:11434
@@ -190,8 +190,8 @@ Gracefully stops the running MCP server:
 
 Displays server log files with detailed information:
 
-- **Standard Output Log**: `logs/ollama_mcp_server.log`
-- **Error Log**: `logs/ollama_mcp_server_error.log`
+- **Standard Output Log**: `logs/mcp_ollama_server.log`
+- **Error Log**: `logs/mcp_ollama_server_error.log`
 - **File Sizes**: Shows log file sizes for debugging
 - **UTF-8 Encoding**: Handles encoding issues gracefully
 
@@ -313,12 +313,12 @@ mcp-ollama-python/
 ├── scripts/
 │   └── mcp_interactive.py          # Main script
 ├── tmp/                             # Temporary files (auto-created)
-│   ├── .ollama_mcp_server.pid      # Server process ID
-│   ├── .ollama_mcp_server_*.pipe   # Pipe file descriptors
+│   ├── .mcp_ollama_server.pid      # Server process ID
+│   ├── .mcp_ollama_server_*.pipe   # Pipe file descriptors
 │   └── .mcp_env_vars.json          # Persistent environment variables
 ├── logs/                            # Log files (auto-created)
-│   ├── ollama_mcp_server.log       # Standard output
-│   └── ollama_mcp_server_error.log # Error output
+│   ├── mcp_ollama_server.log       # Standard output
+│   └── mcp_ollama_server_error.log # Error output
 └── src/
     └── mcp_ollama_python/           # MCP server package
 ```
@@ -424,7 +424,7 @@ MCP (Model Context Protocol) is a standardized protocol...
 Select option (1-9): 4
 
 # View log content
-Log file: D:\Pdj\gitHub\mcp-ollama-python\logs\ollama_mcp_server.log
+Log file: D:\Pdj\gitHub\mcp-ollama-python\logs\mcp_ollama_server.log
 
 Log content:
 Starting Ollama MCP Server...
@@ -468,7 +468,7 @@ process = subprocess.Popen(
 **Implementation**:
 1. Create pipe: `stdin_read, stdin_write = os.pipe()`
 2. Pass read end to subprocess
-3. Store write end in `tmp/.ollama_mcp_server_{pid}.pipe`
+3. Store write end in `tmp/.mcp_ollama_server_{pid}.pipe`
 4. Close write end during shutdown to signal EOF
 
 ### Stale File Cleanup
@@ -522,7 +522,7 @@ asyncio.run(execute_command())
 - Verify Python version: `python --version` (requires 3.10+)
 - Ensure Poetry dependencies are installed: `poetry install`
 - Check for port conflicts
-- Review error log: `logs/ollama_mcp_server_error.log`
+- Review error log: `logs/mcp_ollama_server_error.log`
 - Verify you're running with Poetry: `poetry run python scripts/mcp_interactive.py`
 
 #### 2. Stale PID File
@@ -531,7 +531,7 @@ asyncio.run(execute_command())
 
 **Solutions**:
 - The script automatically detects and cleans stale PID files
-- If issue persists, manually delete: `tmp/.ollama_mcp_server.pid`
+- If issue persists, manually delete: `tmp/.mcp_ollama_server.pid`
 - Run status check (Option 1) to trigger cleanup
 
 #### 3. Cannot Connect to Ollama

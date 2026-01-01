@@ -31,15 +31,15 @@ except ImportError:
 
 # Server process tracking (store in tmp directory)
 TMP_DIR = PROJECT_ROOT / "tmp"
-PID_FILE = TMP_DIR / ".ollama_mcp_server.pid"
+PID_FILE = TMP_DIR / ".mcp_ollama_server.pid"
 
 # Environment variables storage (store in tmp directory)
 ENV_VARS_FILE = TMP_DIR / ".mcp_env_vars.json"
 
 # Server log files (store in logs directory)
 LOGS_DIR = PROJECT_ROOT / "logs"
-LOG_FILE = LOGS_DIR / "ollama_mcp_server.log"
-ERROR_LOG_FILE = LOGS_DIR / "ollama_mcp_server_error.log"
+LOG_FILE = LOGS_DIR / "mcp_ollama_server.log"
+ERROR_LOG_FILE = LOGS_DIR / "mcp_ollama_server_error.log"
 
 # Ensure tmp and logs directories exist
 TMP_DIR.mkdir(exist_ok=True)
@@ -80,11 +80,11 @@ def is_mcp_server_process(pid: int) -> bool:
 def cleanup_stale_pipe_files(current_pid: Optional[int] = None):
     """Remove all pipe files that don't correspond to the running MCP server"""
     try:
-        for pipe_file in TMP_DIR.glob(".ollama_mcp_server_*.pipe"):
+        for pipe_file in TMP_DIR.glob(".mcp_ollama_server_*.pipe"):
             # Extract PID from filename
             try:
                 filename = pipe_file.name
-                pid_str = filename.replace(".ollama_mcp_server_", "").replace(".pipe", "")
+                pid_str = filename.replace(".mcp_ollama_server_", "").replace(".pipe", "")
                 file_pid = int(pid_str)
                 
                 # Remove if it's not the current PID or if the process isn't running
@@ -303,7 +303,7 @@ class MCPInteractive:
             os.close(stdin_read)
             # Keep the write end open to prevent EOF
             # Store it in tmp directory so we can close it when stopping the server
-            pipe_file = TMP_DIR / f".ollama_mcp_server_{process.pid}.pipe"
+            pipe_file = TMP_DIR / f".mcp_ollama_server_{process.pid}.pipe"
             pipe_file.write_text(str(stdin_write))
             
             PID_FILE.write_text(str(process.pid))
@@ -341,7 +341,7 @@ class MCPInteractive:
         
         try:
             # Close the pipe to trigger server shutdown
-            pipe_file = TMP_DIR / f".ollama_mcp_server_{pid}.pipe"
+            pipe_file = TMP_DIR / f".mcp_ollama_server_{pid}.pipe"
             if pipe_file.exists():
                 try:
                     pipe_fd = int(pipe_file.read_text())

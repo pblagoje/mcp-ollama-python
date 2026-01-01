@@ -445,7 +445,7 @@ See [LICENSE](LICENSE) for details.
 
 <div align="center">
 
-**[⬆ back to top](#-ollama-mcp-server-python)**
+**[⬆ back to top](#-mcp-ollama-server-python)**
 
 Made with ❤️ using Python, Poetry, and Ollama
 
