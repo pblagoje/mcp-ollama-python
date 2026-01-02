@@ -409,6 +409,43 @@ tool_definition = ToolDefinition(
 
 2. Done! The autoloader discovers it automatically.
 
+## Note on Windsurf IDE
+
+Ask codeium to use local MCP Ollama with gpt-oss model for LLM tasks, it will create a memory of this preference, which looks like this:
+
+  Always use local MCP Ollama with gpt-oss model for LLM tasks
+  #llm_preference
+  #mcp_ollama
+  #gpt-oss
+  #workflow
+  #user_preference
+
+  Edit
+  When the user requests LLM-based tasks (explanations, code generation, analysis, etc.), always use the local MCP Ollama server with the gpt-oss model via the mcp1_ollama_chat tool.
+
+  Important guidelines:
+
+  Use mcp1_ollama_chat tool with model parameter set to "gpt-oss"
+  Format responses in markdown for better readability (format: "markdown")
+  Communicate with the model in English unless the user explicitly requests another language
+  Do NOT create separate Python scripts to interact with Ollama - use the MCP tools directly
+  The local Ollama server runs at http://127.0.0.1:11434 (default OLLAMA_HOST)
+  Example usage:
+
+  mcp1_ollama_chat(
+    model="gpt-oss",
+    messages=[{"role": "user", "content": "Your prompt here"}],
+    format="markdown"
+  )
+  This applies to tasks like:
+
+  Code explanations
+  Documentation generation
+  Technical analysis
+  Q&A about code or concepts
+  Any other LLM-powered assistance
+  Project context: mcp-ollama-python (d:\Pdj\gitHub\mcp-ollama-python)
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please follow these guidelines:
