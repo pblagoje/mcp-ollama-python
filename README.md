@@ -44,7 +44,7 @@ This Python implementation provides the same functionality as the TypeScript ver
 - Poetry (for development)
 - Ollama running locally
 
-### Quick Install with Poetry, run only if you wish to test using scripts, otherwise integration with Windsurf or VS Code will take care of it.
+### Quick Install with Poetry
 
 ```bash
 # Clone the repository
@@ -54,11 +54,11 @@ cd mcp-ollama-python
 # Install dependencies
 py -m poetry install
 
-# Run the server
+# Run the server, run only if you wish to test using scripts, otherwise integration with Windsurf or VS Code will take care of it.
 py -m poetry run mcp-ollama-python
 ```
 
-### Manual Installation, run only if you wish to test using scripts, otherwise integration with Windsurf or VS Code will take care of it.
+### Manual Installation
 
 ```bash
 # Install Poetry if you don't have it
@@ -68,6 +68,8 @@ curl -sSL https://install.python-poetry.org | python3 -
 git clone <repository-url>
 cd mcp-ollama-python
 poetry install
+
+# Run the server, run only if you wish to test using scripts, otherwise integration with Windsurf or VS Code will take care of it.
 poetry run mcp-ollama-python
 ```
 
