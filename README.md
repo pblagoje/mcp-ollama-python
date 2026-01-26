@@ -44,7 +44,7 @@ This Python implementation provides the same functionality as the TypeScript ver
 - Poetry (for development)
 - Ollama running locally
 
-### Quick Install with Poetry
+### Quick Install with Poetry, run only if you wish to test using scripts, otherwise integration with Windsurf or VS Code will take care of it.
 
 ```bash
 # Clone the repository
@@ -58,7 +58,7 @@ py -m poetry install
 py -m poetry run mcp-ollama-python
 ```
 
-### Manual Installation
+### Manual Installation, run only if you wish to test using scripts, otherwise integration with Windsurf or VS Code will take care of it.
 
 ```bash
 # Install Poetry if you don't have it
@@ -71,7 +71,7 @@ poetry install
 poetry run mcp-ollama-python
 ```
 
-## 🛠️ Create Win11 exe
+## 🛠️ Create Win11 exe only if you wish to have an executable, otherwise it is not needed.
 cd ...mcp-ollama-python
 poetry run pyinstaller mcp-ollama-python.spec --clean --distpath bin
 
