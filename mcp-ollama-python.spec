@@ -15,6 +15,8 @@ a = Analysis(
         'signal',
         'sys',
         'typing',
+        # Timezone data
+        'tzdata',
         # MCP dependencies
         'mcp',
         'mcp.server',

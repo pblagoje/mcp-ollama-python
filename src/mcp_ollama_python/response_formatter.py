@@ -4,8 +4,11 @@ Response formatting utilities
 
 import json
 from typing import Any, Dict, List
-from .models import ResponseFormat
 
+try:
+    from mcp_ollama_python.models import ResponseFormat
+except ImportError as e:
+    from .models import ResponseFormat
 
 def format_response(content: Any, format: ResponseFormat) -> str:
     """Format response content based on the specified format"""
@@ -16,7 +19,7 @@ def format_response(content: Any, format: ResponseFormat) -> str:
         else:
             # Format as markdown
             return json_to_markdown(content)
-    
+
     # Handle string input
     if format == ResponseFormat.JSON:
         # For JSON format, validate and potentially wrap errors

@@ -6,7 +6,10 @@ import os
 import httpx
 from typing import Any, Dict, List, Optional, Union
 import json
-from .models import GenerationOptions, ChatMessage, Tool
+try:
+    from mcp_ollama_python.models import GenerationOptions, ChatMessage, Tool
+except ImportError as e:
+    from .models import GenerationOptions, ChatMessage, Tool
 
 
 class OllamaClient:

@@ -6,9 +6,13 @@ import importlib
 import os
 import pkgutil
 from typing import List, Callable, Any, Dict, Tuple
-from .models import ToolDefinition, ResponseFormat
-from .ollama_client import OllamaClient
 
+try:
+    from mcp_ollama_python.ollama_client import OllamaClient
+    from mcp_ollama_python.models import ToolDefinition, ResponseFormat
+except ImportError as e:
+    from .ollama_client import OllamaClient
+    from .models import ToolDefinition, ResponseFormat
 
 # Type for tool handler function
 ToolHandler = Callable[[OllamaClient, Dict[str, Any], ResponseFormat], str]
@@ -19,12 +23,12 @@ class ToolRegistry:
     def __init__(self):
         self.tools: List[ToolDefinition] = []
         self.handlers: Dict[str, ToolHandler] = {}
-    
+
     def register(self, tool_def: ToolDefinition, handler: ToolHandler):
         """Register a tool definition with its handler"""
         self.tools.append(tool_def)
         self.handlers[tool_def.name] = handler
-    
+
     def get_handler(self, tool_name: str) -> ToolHandler:
         """Get handler for a tool by name"""
         return self.handlers.get(tool_name)
@@ -63,11 +67,11 @@ async def discover_tools_with_handlers() -> ToolRegistry:
             # Check if module exports tool_definition
             if hasattr(module, 'tool_definition'):
                 tool_def = getattr(module, 'tool_definition')
-                
+
                 # Convert dict to ToolDefinition if needed
                 if isinstance(tool_def, dict):
                     tool_def = ToolDefinition(**tool_def)
-                
+
                 if isinstance(tool_def, ToolDefinition):
                     # Find the handler function (should end with _handler)
                     handler = None
@@ -75,7 +79,7 @@ async def discover_tools_with_handlers() -> ToolRegistry:
                         if attr_name.endswith('_handler') and callable(getattr(module, attr_name)):
                             handler = getattr(module, attr_name)
                             break
-                    
+
                     if handler:
                         registry.register(tool_def, handler)
                     else:

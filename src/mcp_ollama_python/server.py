@@ -4,9 +4,14 @@ MCP Server implementation for Ollama
 
 import json
 from typing import Any, Dict, Optional
-from .ollama_client import OllamaClient
-from .autoloader import discover_tools_with_handlers, ToolRegistry
-from .models import ResponseFormat
+try:
+    from mcp_ollama_python.ollama_client import OllamaClient
+    from mcp_ollama_python.autoloader import discover_tools_with_handlers, ToolRegistry
+    from mcp_ollama_python.models import ResponseFormat
+except ImportError as e:
+    from .ollama_client import OllamaClient
+    from .autoloader import discover_tools_with_handlers, ToolRegistry
+    from .models import ResponseFormat
 
 
 class OllamaMCPServer:
@@ -46,7 +51,7 @@ class OllamaMCPServer:
 
             # Get the handler for this tool
             handler = self.tool_registry.get_handler(name)
-            
+
             if not handler:
                 raise ValueError(f"Unknown tool: {name}")
 
@@ -236,7 +241,7 @@ class OllamaMCPServer:
             # Generate prompt based on name
             if name == "explain_lora":
                 detail = args.get("detail_level", "basic")
-                prompt_text = f"""Explain LoRA (Low-Rank Adaptation) at a {detail} level. 
+                prompt_text = f"""Explain LoRA (Low-Rank Adaptation) at a {detail} level.
 Include:
 - What it is and why it's useful
 - How it works technically
@@ -278,4 +283,3 @@ Include:
         except Exception as error:
             error_message = str(error) if isinstance(error, Exception) else str(error)
             raise ValueError(f"Error getting prompt: {error_message}")
-

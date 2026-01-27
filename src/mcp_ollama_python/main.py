@@ -6,8 +6,14 @@ import asyncio
 import signal
 import sys
 from typing import Optional
-from .server import OllamaMCPServer
-from .ollama_client import OllamaClient
+
+# Use absolute imports so PyInstaller/standalone execution works even when __package__ is not set
+try:
+    from mcp_ollama_python.server import OllamaMCPServer
+    from mcp_ollama_python.ollama_client import OllamaClient
+except ImportError as e:
+    from .server import OllamaMCPServer
+    from .ollama_client import OllamaClient
 
 try:
     from mcp.server import Server
@@ -48,10 +54,10 @@ def signal_handler(signum, frame):
 async def main():
     """Main function to start the MCP server"""
     global _server_instance, _shutdown_event
-    
+
     # Create shutdown event
     _shutdown_event = asyncio.Event()
-    
+
     # Register signal handlers for graceful shutdown
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
@@ -65,7 +71,7 @@ async def main():
     # Create MCP server instance
     mcp_server = Server("ollama-mcp")
     _server_instance = mcp_server
-    
+
     safe_print("Starting Ollama MCP Server...")
     safe_print("Press Ctrl+C to stop the server")
 
@@ -146,7 +152,7 @@ async def main():
         async with stdio_server() as (read_stream, write_stream):
             safe_print("Server started successfully!")
             safe_print("Waiting for MCP client connections...")
-            
+
             # Create server task
             server_task = asyncio.create_task(
                 mcp_server.run(
@@ -155,14 +161,14 @@ async def main():
                     mcp_server.create_initialization_options(),
                 )
             )
-            
+
             # Wait for either server completion or shutdown signal
             shutdown_task = asyncio.create_task(_shutdown_event.wait())
             done, pending = await asyncio.wait(
                 [server_task, shutdown_task],
                 return_when=asyncio.FIRST_COMPLETED
             )
-            
+
             # Cancel pending tasks
             for task in pending:
                 task.cancel()
@@ -170,9 +176,9 @@ async def main():
                     await task
                 except asyncio.CancelledError:
                     pass
-            
+
             safe_print("Server stopped.")
-            
+
     except KeyboardInterrupt:
         safe_print("\nServer interrupted by user")
     except Exception as e:
