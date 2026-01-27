@@ -14,6 +14,16 @@ This is a Python port of the [TypeScript ollama-mcp](https://github.com/rawveg/o
 
 ---
 
+## Example of usage
+
+Type in the chat window:
+
+- **MCP Tool: ollama / ollama_chat**. Use model llava and tell me a bed time story
+
+- **MCP Tool: ollama / ollama_chat**. Use model gpt-oss and tell me a bed time story
+
+---
+
 ## ✨ Features
 
 - ☁️ **Ollama Cloud Support** - Full integration with Ollama's cloud platform
@@ -73,7 +83,7 @@ poetry install
 poetry run mcp-ollama-python
 ```
 
-## 🛠️ Create Win11 exe only if you wish to have an executable, otherwise it is not needed.
+## 🛠️ Create Win11 exe only if you wish to use a Windows executable, otherwise it is not needed.
 cd ...mcp-ollama-python
 
 poetry run pyinstaller mcp-ollama-python.spec --clean --distpath bin
@@ -189,7 +199,7 @@ Windsurf is an AI-powered code editor that supports MCP servers. This section pr
 
 Add the Ollama MCP server to your Windsurf MCP configuration:
 
-**`%USERPROFILE%\.codeium\windsurf\mcp_config.json`** (Windows)  
+**`%USERPROFILE%\.codeium\windsurf\mcp_config.json`** (Windows)
 **`~/.codeium/windsurf/mcp_config.json`** (macOS/Linux)
 
 ```json
@@ -209,6 +219,37 @@ Add the Ollama MCP server to your Windsurf MCP configuration:
     }
   }
 }
+```
+
+Windsurf Tools setup file:
+** .windsurf\workflows\tools.md
+```
+---
+description: Quick reference for Windsurf MCP tools (mcp-ollama)
+auto_execution_mode: 2
+---
+
+# MCP Tools (mcp-ollama)
+
+Available tools exposed by the local `mcp-ollama-python` server:
+
+- **ollama_chat** – Interactive chat with models (multi-turn, tool-calling, structured outputs)
+- **ollama_list** – List installed models
+- **ollama_show** – Show details for a specific model
+- **ollama_generate** – Single-prompt text generation
+- **ollama_pull** – Pull a model from a registry
+- **ollama_delete** – Delete a local model
+- **ollama_ps** – List running models
+- **ollama_embed** – Create embeddings for input text
+- **ollama_execute** – Execute a system command via the server (utility/test)
+
+## How to list tools in Windsurf
+1) Open the command palette and run: `MCP: List Tools`
+2) Or run the MCP tool via the chat with: `/tools`
+
+## Notes
+- Server: local Ollama via `mcp-ollama-python`
+- Formats: most tools accept `format` = `json` (default) or `markdown`
 ```
 
 **Configuration Options:**
@@ -236,7 +277,7 @@ Add the Ollama MCP server to your Windsurf MCP configuration:
 
 Set Windsurf to prefer your local MCP server over cloud models:
 
-**`%USERPROFILE%\.codeium\windsurf\settings.json`** (Windows)  
+**`%USERPROFILE%\.codeium\windsurf\settings.json`** (Windows)
 **`~/.codeium/windsurf/settings.json`** (macOS/Linux)
 
 ```json
@@ -258,7 +299,7 @@ Set Windsurf to prefer your local MCP server over cloud models:
 
 Create custom instructions to ensure Windsurf uses your local model:
 
-**`%USERPROFILE%\.codeium\windsurf\instructions.md`** (Windows)  
+**`%USERPROFILE%\.codeium\windsurf\instructions.md`** (Windows)
 **`~/.codeium/windsurf/instructions.md`** (macOS/Linux)
 
 ```markdown
