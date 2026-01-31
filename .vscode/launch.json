@@ -1,35 +1,15 @@
 {
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Run Ollama MCP Server",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "mcp_ollama_python",
-            "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal",
-            "justMyCode": true,
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}/src"
-            }
-        },
-        {
-            "name": "Python: Current File",
+            "name": "Python Debugger: Current File",
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
-            "console": "integratedTerminal",
-            "justMyCode": true,
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "name": "Python: Run main.py",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/mcp_ollama_python/main.py",
-            "console": "integratedTerminal",
-            "justMyCode": true,
-            "cwd": "${workspaceFolder}"
+            "console": "integratedTerminal"
         }
     ]
 }
