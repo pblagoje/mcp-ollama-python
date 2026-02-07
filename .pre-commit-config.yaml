@@ -1,0 +1,31 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        files: "^(src/.*\\.py|.*\\.yml|.*\\.yaml)$"
+      - id: end-of-file-fixer
+        files: "^(src/.*\\.py|.*\\.yml|.*\\.yaml)$"
+      - id: check-yaml
+        files: "^(.*\\.yml|.*\\.yaml)$"
+      - id: check-added-large-files
+        files: "^(src/.*\\.py|.*\\.yml|.*\\.yaml)$"
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        language_version: python3
+        verbose: true
+        files: "^src/.*\\.py$"
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        verbose: true
+        args: ['--exit-zero']
+        files: "^src/.*\\.py$"
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.2
+    hooks:
+      - id: gitleaks
+        files: ".*"

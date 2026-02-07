@@ -7,8 +7,9 @@ from typing import Any, Dict, List
 
 try:
     from mcp_ollama_python.models import ResponseFormat
-except ImportError as e:
+except ImportError:
     from .models import ResponseFormat
+
 
 def format_response(content: Any, format: ResponseFormat) -> str:
     """Format response content based on the specified format"""
@@ -29,10 +30,12 @@ def format_response(content: Any, format: ResponseFormat) -> str:
             return content
         except json.JSONDecodeError:
             # If not valid JSON, wrap in error object
-            return json.dumps({
-                "error": "Invalid JSON content",
-                "raw_content": content,
-            })
+            return json.dumps(
+                {
+                    "error": "Invalid JSON content",
+                    "raw_content": content,
+                }
+            )
 
     # Format as markdown
     try:
@@ -63,28 +66,20 @@ def json_to_markdown(data: Any, indent: str = "") -> str:
             return array_to_markdown_table(data, indent)
 
         # Array of primitives or mixed types
-        return "\n".join(
-            f"{indent}- {json_to_markdown(item, '')}"
-            for item in data
-        )
+        return "\n".join(f"{indent}- {json_to_markdown(item, '')}" for item in data)
 
     # Handle objects
     entries = list(data.items())
     if len(entries) == 0:
         return f"{indent}_empty object_"
 
-    return "\n".join(
-        _format_object_entry(key, value, indent)
-        for key, value in entries
-    )
+    return "\n".join(_format_object_entry(key, value, indent) for key, value in entries)
 
 
 def _format_object_entry(key: str, value: Any, indent: str) -> str:
     """Format a single key-value pair in an object"""
     formatted_key = key.replace("_", " ")
     if isinstance(value, (dict, list)) and value is not None:
-        if isinstance(value, list):
-            return f"{indent}**{formatted_key}:**\n{json_to_markdown(value, indent + '  ')}"
         return f"{indent}**{formatted_key}:**\n{json_to_markdown(value, indent + '  ')}"
     return f"{indent}**{formatted_key}:** {value}"
 
@@ -94,11 +89,10 @@ def array_to_markdown_table(data: List[Dict[str, Any]], indent: str = "") -> str
     if not data or not isinstance(data[0], dict):
         return json_to_markdown(data, indent)
 
-    # Get all unique keys from all objects
-    all_keys = set()
-    for item in data:
-        if isinstance(item, dict):
-            all_keys.update(item.keys())
+    # Get all unique keys from all objects, preserving insertion order
+    all_keys = dict.fromkeys(
+        key for item in data if isinstance(item, dict) for key in item
+    )
 
     if not all_keys:
         return f"{indent}_empty array_"

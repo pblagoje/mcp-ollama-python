@@ -63,11 +63,11 @@ class TestOllamaClientContextManager:
         with patch('httpx.AsyncClient') as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             async with OllamaClient() as client:
                 pass
-            
+
             mock_client.aclose.assert_called_once()
 
 
@@ -81,15 +81,15 @@ class TestOllamaClientPost:
             mock_response = MagicMock()
             mock_response.json.return_value = {"result": "success"}
             mock_response.raise_for_status = MagicMock()
-            
+
             mock_client = AsyncMock()
             mock_client.post = AsyncMock(return_value=mock_response)
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
             result = await client._post("/api/test", {"key": "value"})
-            
+
             assert result == {"result": "success"}
             mock_client.post.assert_called_once_with("/api/test", json={"key": "value"})
 
@@ -97,7 +97,7 @@ class TestOllamaClientPost:
     async def test_post_http_error(self):
         """Test POST request with HTTP error"""
         import httpx
-        
+
         with patch('httpx.AsyncClient') as mock_client_class:
             mock_response = MagicMock()
             mock_response.status_code = 500
@@ -105,17 +105,17 @@ class TestOllamaClientPost:
             mock_response.raise_for_status.side_effect = httpx.HTTPStatusError(
                 "Error", request=MagicMock(), response=mock_response
             )
-            
+
             mock_client = AsyncMock()
             mock_client.post = AsyncMock(return_value=mock_response)
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
-            
+
             with pytest.raises(Exception) as exc_info:
                 await client._post("/api/test", {})
-            
+
             assert "Ollama API error" in str(exc_info.value)
 
     @pytest.mark.asyncio
@@ -125,13 +125,13 @@ class TestOllamaClientPost:
             mock_client = AsyncMock()
             mock_client.post = AsyncMock(side_effect=Exception("Connection refused"))
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
-            
+
             with pytest.raises(Exception) as exc_info:
                 await client._post("/api/test", {})
-            
+
             assert "Failed to connect to Ollama" in str(exc_info.value)
 
 
@@ -145,18 +145,18 @@ class TestOllamaClientListModels:
             mock_response = MagicMock()
             mock_response.json.return_value = mock_ollama_response_list
             mock_response.raise_for_status = MagicMock()
-            
+
             mock_client = AsyncMock()
-            mock_client.post = AsyncMock(return_value=mock_response)
+            mock_client.get = AsyncMock(return_value=mock_response)
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
             result = await client.list()
-            
+
             assert "models" in result
             assert len(result["models"]) == 2
-            mock_client.post.assert_called_once_with("/api/tags", json={})
+            mock_client.get.assert_called_once_with("/api/tags")
 
 
 class TestOllamaClientShowModel:
@@ -169,15 +169,15 @@ class TestOllamaClientShowModel:
             mock_response = MagicMock()
             mock_response.json.return_value = mock_ollama_response_show
             mock_response.raise_for_status = MagicMock()
-            
+
             mock_client = AsyncMock()
             mock_client.post = AsyncMock(return_value=mock_response)
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
             result = await client.show("llama3.1:latest")
-            
+
             assert "modelfile" in result
             assert "details" in result
             mock_client.post.assert_called_once_with("/api/show", json={"name": "llama3.1:latest"})
@@ -193,15 +193,15 @@ class TestOllamaClientGenerate:
             mock_response = MagicMock()
             mock_response.json.return_value = mock_ollama_response_generate
             mock_response.raise_for_status = MagicMock()
-            
+
             mock_client = AsyncMock()
             mock_client.post = AsyncMock(return_value=mock_response)
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
             result = await client.generate("llama3.1", "Hello")
-            
+
             assert "response" in result
             assert result["done"] is True
 
@@ -212,17 +212,17 @@ class TestOllamaClientGenerate:
             mock_response = MagicMock()
             mock_response.json.return_value = mock_ollama_response_generate
             mock_response.raise_for_status = MagicMock()
-            
+
             mock_client = AsyncMock()
             mock_client.post = AsyncMock(return_value=mock_response)
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
-            
+
             options = GenerationOptions(temperature=0.7, top_p=0.9)
             result = await client.generate("llama3.1", "Hello", options=options)
-            
+
             # Verify options were passed
             call_args = mock_client.post.call_args
             assert "options" in call_args.kwargs["json"]
@@ -238,17 +238,17 @@ class TestOllamaClientChat:
             mock_response = MagicMock()
             mock_response.json.return_value = mock_ollama_response_chat
             mock_response.raise_for_status = MagicMock()
-            
+
             mock_client = AsyncMock()
             mock_client.post = AsyncMock(return_value=mock_response)
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
-            
+
             messages = [ChatMessage(role=MessageRole.USER, content="Hello")]
             result = await client.chat("llama3.1", messages)
-            
+
             assert "message" in result
             assert result["message"]["role"] == "assistant"
 
@@ -259,20 +259,20 @@ class TestOllamaClientChat:
             mock_response = MagicMock()
             mock_response.json.return_value = mock_ollama_response_chat
             mock_response.raise_for_status = MagicMock()
-            
+
             mock_client = AsyncMock()
             mock_client.post = AsyncMock(return_value=mock_response)
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
-            
+
             messages = [
                 ChatMessage(role=MessageRole.SYSTEM, content="You are helpful"),
                 ChatMessage(role=MessageRole.USER, content="Hello")
             ]
             result = await client.chat("llama3.1", messages)
-            
+
             # Verify messages were serialized
             call_args = mock_client.post.call_args
             sent_messages = call_args.kwargs["json"]["messages"]
@@ -289,16 +289,16 @@ class TestOllamaClientModelManagement:
             mock_response = MagicMock()
             mock_response.json.return_value = {"status": "success"}
             mock_response.raise_for_status = MagicMock()
-            
+
             mock_client = AsyncMock()
             mock_client.post = AsyncMock(return_value=mock_response)
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
             result = await client.pull("llama3.1")
-            
-            mock_client.post.assert_called_once_with("/api/pull", json={"name": "llama3.1"})
+
+            mock_client.post.assert_called_once_with("/api/pull", json={"name": "llama3.1", "stream": False})
 
     @pytest.mark.asyncio
     async def test_delete_model(self):
@@ -307,16 +307,21 @@ class TestOllamaClientModelManagement:
             mock_response = MagicMock()
             mock_response.json.return_value = {"status": "success"}
             mock_response.raise_for_status = MagicMock()
-            
+            mock_response.headers = {"content-length": "0"}
+            mock_response.content = b""
+
             mock_client = AsyncMock()
-            mock_client.post = AsyncMock(return_value=mock_response)
+            mock_client.request = AsyncMock(return_value=mock_response)
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
             result = await client.delete("old-model")
-            
-            mock_client.post.assert_called_once_with("/api/delete", json={"name": "old-model"})
+
+            mock_client.request.assert_called_once_with(
+                "DELETE", "/api/delete", json={"name": "old-model"}
+            )
+            assert result == {"status": "success"}
 
     @pytest.mark.asyncio
     async def test_copy_model(self):
@@ -325,17 +330,17 @@ class TestOllamaClientModelManagement:
             mock_response = MagicMock()
             mock_response.json.return_value = {"status": "success"}
             mock_response.raise_for_status = MagicMock()
-            
+
             mock_client = AsyncMock()
             mock_client.post = AsyncMock(return_value=mock_response)
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
             result = await client.copy("source-model", "dest-model")
-            
+
             mock_client.post.assert_called_once_with(
-                "/api/copy", 
+                "/api/copy",
                 json={"source": "source-model", "destination": "dest-model"}
             )
 
@@ -346,17 +351,17 @@ class TestOllamaClientModelManagement:
             mock_response = MagicMock()
             mock_response.json.return_value = mock_ollama_response_ps
             mock_response.raise_for_status = MagicMock()
-            
+
             mock_client = AsyncMock()
-            mock_client.post = AsyncMock(return_value=mock_response)
+            mock_client.get = AsyncMock(return_value=mock_response)
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
             result = await client.ps()
-            
+
             assert "models" in result
-            mock_client.post.assert_called_once_with("/api/ps", json={})
+            mock_client.get.assert_called_once_with("/api/ps")
 
 
 class TestOllamaClientEmbeddings:
@@ -369,18 +374,18 @@ class TestOllamaClientEmbeddings:
             mock_response = MagicMock()
             mock_response.json.return_value = {"embeddings": [[0.1, 0.2, 0.3]]}
             mock_response.raise_for_status = MagicMock()
-            
+
             mock_client = AsyncMock()
             mock_client.post = AsyncMock(return_value=mock_response)
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
             result = await client.embed("nomic-embed-text", "Hello world")
-            
+
             assert "embeddings" in result
             mock_client.post.assert_called_once_with(
-                "/api/embed", 
+                "/api/embed",
                 json={"model": "nomic-embed-text", "input": "Hello world"}
             )
 
@@ -393,15 +398,15 @@ class TestOllamaClientEmbeddings:
                 "embeddings": [[0.1, 0.2], [0.3, 0.4]]
             }
             mock_response.raise_for_status = MagicMock()
-            
+
             mock_client = AsyncMock()
             mock_client.post = AsyncMock(return_value=mock_response)
             mock_client_class.return_value = mock_client
-            
+
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
             result = await client.embed("nomic-embed-text", ["Text 1", "Text 2"])
-            
+
             assert len(result["embeddings"]) == 2
 
 

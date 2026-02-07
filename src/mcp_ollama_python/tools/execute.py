@@ -28,7 +28,7 @@ async def execute_handler(
             gen_prompt = f"Write a complete, runnable {language} program that: {prompt}\n\nProvide only the code, no explanations."
             result = await ollama.generate(model, gen_prompt)
             code = result.get("response", "")
-            
+
             # Clean up code (remove markdown code blocks if present)
             if "```" in code:
                 lines = code.split("\n")
@@ -38,24 +38,24 @@ async def execute_handler(
                     if line.strip().startswith("```"):
                         in_code_block = not in_code_block
                         continue
-                    if in_code_block or (not any(line.strip().startswith(x) for x in ["```"])):
+                    if in_code_block:
                         code_lines.append(line)
                 code = "\n".join(code_lines).strip()
         except Exception as e:
-            return format_response({
-                "error": f"Failed to generate code: {str(e)}"
-            }, format)
+            return format_response(
+                {"error": f"Failed to generate code: {str(e)}"}, format
+            )
 
     if not code:
-        raise ValueError("Code is required (either provided directly or generated via prompt)")
+        raise ValueError(
+            "Code is required (either provided directly or generated via prompt)"
+        )
 
     # Execute the code
     try:
         # Create temporary file
         with tempfile.NamedTemporaryFile(
-            mode='w',
-            suffix=f'.{_get_file_extension(language)}',
-            delete=False
+            mode="w", suffix=f".{_get_file_extension(language)}", delete=False
         ) as f:
             f.write(code)
             temp_file = f.name
@@ -63,14 +63,14 @@ async def execute_handler(
         try:
             # Get the command to run
             cmd = _get_execution_command(language, temp_file)
-            
+
             # Execute with timeout
             result = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
                 timeout=30,
-                shell=True if sys.platform == "win32" else False
+                shell=True if sys.platform == "win32" else False,
             )
 
             output = {
@@ -79,7 +79,7 @@ async def execute_handler(
                 "stdout": result.stdout,
                 "stderr": result.stderr,
                 "returncode": result.returncode,
-                "success": result.returncode == 0
+                "success": result.returncode == 0,
             }
 
             if generate:
@@ -92,19 +92,17 @@ async def execute_handler(
             # Clean up temp file
             try:
                 os.unlink(temp_file)
-            except:
+            except OSError:
                 pass
 
     except subprocess.TimeoutExpired:
-        return format_response({
-            "error": "Execution timed out (30 seconds limit)",
-            "code": code
-        }, format)
+        return format_response(
+            {"error": "Execution timed out (30 seconds limit)", "code": code}, format
+        )
     except Exception as e:
-        return format_response({
-            "error": f"Execution failed: {str(e)}",
-            "code": code
-        }, format)
+        return format_response(
+            {"error": f"Execution failed: {str(e)}", "code": code}, format
+        )
 
 
 def _get_file_extension(language: str) -> str:
@@ -121,7 +119,7 @@ def _get_file_extension(language: str) -> str:
         "ruby": "rb",
         "php": "php",
         "bash": "sh",
-        "shell": "sh"
+        "shell": "sh",
     }
     return extensions.get(language.lower(), "txt")
 
@@ -138,11 +136,11 @@ def _get_execution_command(language: str, file_path: str) -> list:
         "php": ["php", file_path],
         "go": ["go", "run", file_path],
     }
-    
+
     cmd = commands.get(language.lower())
     if not cmd:
         raise ValueError(f"Unsupported language: {language}")
-    
+
     return cmd
 
 
@@ -160,13 +158,22 @@ tool_definition = ToolDefinition(
             "language": {
                 "type": "string",
                 "description": "Programming language (default: python)",
-                "enum": ["python", "javascript", "typescript", "bash", "shell", "ruby", "php", "go"],
-                "default": "python"
+                "enum": [
+                    "python",
+                    "javascript",
+                    "typescript",
+                    "bash",
+                    "shell",
+                    "ruby",
+                    "php",
+                    "go",
+                ],
+                "default": "python",
             },
             "generate": {
                 "type": "boolean",
                 "description": "Generate code using AI before executing (default: false)",
-                "default": False
+                "default": False,
             },
             "prompt": {
                 "type": "string",
@@ -175,7 +182,7 @@ tool_definition = ToolDefinition(
             "model": {
                 "type": "string",
                 "description": "Model to use for code generation (default: llama3.1)",
-                "default": "llama3.1"
+                "default": "llama3.1",
             },
             "format": {
                 "type": "string",

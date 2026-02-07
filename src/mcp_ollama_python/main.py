@@ -11,7 +11,7 @@ from typing import Optional
 try:
     from mcp_ollama_python.server import OllamaMCPServer
     from mcp_ollama_python.ollama_client import OllamaClient
-except ImportError as e:
+except ImportError:
     from .server import OllamaMCPServer
     from .ollama_client import OllamaClient
 
@@ -165,8 +165,7 @@ async def main():
             # Wait for either server completion or shutdown signal
             shutdown_task = asyncio.create_task(_shutdown_event.wait())
             done, pending = await asyncio.wait(
-                [server_task, shutdown_task],
-                return_when=asyncio.FIRST_COMPLETED
+                [server_task, shutdown_task], return_when=asyncio.FIRST_COMPLETED
             )
 
             # Cancel pending tasks

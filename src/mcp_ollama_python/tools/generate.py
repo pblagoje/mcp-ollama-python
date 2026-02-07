@@ -3,7 +3,12 @@ Ollama generate text tool
 """
 
 from typing import Dict, Any
-from ..models import ToolDefinition, ResponseFormat, GenerationOptions, ModelNotFoundError
+from ..models import (
+    ToolDefinition,
+    ResponseFormat,
+    GenerationOptions,
+    ModelNotFoundError,
+)
 from ..ollama_client import OllamaClient
 from ..response_formatter import format_response
 

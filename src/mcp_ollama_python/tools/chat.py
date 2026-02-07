@@ -2,8 +2,15 @@
 Ollama chat tool
 """
 
-from typing import Dict, Any, List
-from ..models import ToolDefinition, ResponseFormat, ChatMessage, Tool as OllamaTool, GenerationOptions, ModelNotFoundError
+from typing import Dict, Any
+from ..models import (
+    ToolDefinition,
+    ResponseFormat,
+    ChatMessage,
+    Tool as OllamaTool,
+    GenerationOptions,
+    ModelNotFoundError,
+)
 from ..ollama_client import OllamaClient
 from ..response_formatter import format_response
 

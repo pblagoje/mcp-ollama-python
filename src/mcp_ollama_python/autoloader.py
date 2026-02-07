@@ -5,12 +5,12 @@ Tool autoloader - dynamically discovers and loads tools from the tools directory
 import importlib
 import os
 import pkgutil
-from typing import List, Callable, Any, Dict, Tuple
+from typing import List, Callable, Any, Dict
 
 try:
     from mcp_ollama_python.ollama_client import OllamaClient
     from mcp_ollama_python.models import ToolDefinition, ResponseFormat
-except ImportError as e:
+except ImportError:
     from .ollama_client import OllamaClient
     from .models import ToolDefinition, ResponseFormat
 
@@ -20,6 +20,7 @@ ToolHandler = Callable[[OllamaClient, Dict[str, Any], ResponseFormat], str]
 
 class ToolRegistry:
     """Registry for tool definitions and their handlers"""
+
     def __init__(self):
         self.tools: List[ToolDefinition] = []
         self.handlers: Dict[str, ToolHandler] = {}
@@ -46,10 +47,10 @@ async def discover_tools_with_handlers() -> ToolRegistry:
     registry = ToolRegistry()
 
     # Get the tools package path
-    tools_package = importlib.import_module('.tools', package='mcp_ollama_python')
+    tools_package = importlib.import_module(".tools", package="mcp_ollama_python")
 
     # Get the directory path
-    if hasattr(tools_package, '__path__'):
+    if hasattr(tools_package, "__path__"):
         tools_dir = tools_package.__path__[0]
     else:
         # Fallback for different Python versions
@@ -57,16 +58,18 @@ async def discover_tools_with_handlers() -> ToolRegistry:
 
     # Iterate through all Python files in the tools directory
     for _, module_name, _ in pkgutil.iter_modules([tools_dir]):
-        if module_name.startswith('__'):
+        if module_name.startswith("__"):
             continue
 
         try:
             # Import the module
-            module = importlib.import_module(f'.tools.{module_name}', package='mcp_ollama_python')
+            module = importlib.import_module(
+                f".tools.{module_name}", package="mcp_ollama_python"
+            )
 
             # Check if module exports tool_definition
-            if hasattr(module, 'tool_definition'):
-                tool_def = getattr(module, 'tool_definition')
+            if hasattr(module, "tool_definition"):
+                tool_def = getattr(module, "tool_definition")
 
                 # Convert dict to ToolDefinition if needed
                 if isinstance(tool_def, dict):
@@ -76,7 +79,9 @@ async def discover_tools_with_handlers() -> ToolRegistry:
                     # Find the handler function (should end with _handler)
                     handler = None
                     for attr_name in dir(module):
-                        if attr_name.endswith('_handler') and callable(getattr(module, attr_name)):
+                        if attr_name.endswith("_handler") and callable(
+                            getattr(module, attr_name)
+                        ):
                             handler = getattr(module, attr_name)
                             break
 

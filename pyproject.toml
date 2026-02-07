@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "mcp-ollama-python"
-version = "0.2.1"
+version = "1.0.1"
 description = "Model Context Protocol server that proxies local Ollama to MCP clients like Windsurf and VS Code"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Your Name <pb@internetics.net>"]
 readme = "README.md"
 packages = [{include = "mcp_ollama_python", from = "src"}]
 
@@ -22,6 +22,9 @@ mcp-ollama-python = "mcp_ollama_python.main:run"
 pytest = "^8.0.0"
 pytest-asyncio = "^0.23.0"
 pyinstaller = "^6.18.0"
+pre-commit = "^4.5.1"
+black = "^26.1.0"
+flake8 = "^7.3.0"
 
 [tool.ruff]
 line-length = 100

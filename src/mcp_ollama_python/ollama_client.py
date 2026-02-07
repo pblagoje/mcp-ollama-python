@@ -5,11 +5,17 @@ Ollama HTTP client wrapper
 import os
 import httpx
 from typing import Any, Dict, List, Optional, Union
-import json
+
 try:
-    from mcp_ollama_python.models import GenerationOptions, ChatMessage, Tool
-except ImportError as e:
-    from .models import GenerationOptions, ChatMessage, Tool
+    from mcp_ollama_python.models import (
+        GenerationOptions,
+        ChatMessage,
+        Tool,
+        OllamaError,
+        NetworkError,
+    )
+except ImportError:
+    from .models import GenerationOptions, ChatMessage, Tool, OllamaError, NetworkError
 
 
 class OllamaClient:
@@ -28,7 +34,7 @@ class OllamaClient:
             base_url=self.host,
             headers=headers,
             timeout=300.0,  # 5 minute timeout
-            follow_redirects=True  # Follow HTTP redirects (301, 302, etc.)
+            follow_redirects=True,  # Follow HTTP redirects (301, 302, etc.)
         )
 
     async def __aenter__(self):
@@ -44,9 +50,12 @@ class OllamaClient:
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
-            raise Exception(f"Ollama API error: {e.response.status_code} - {e.response.text}")
+            raise OllamaError(
+                f"Ollama API error: {e.response.status_code} - {e.response.text}",
+                cause=e,
+            ) from e
         except Exception as e:
-            raise Exception(f"Failed to connect to Ollama: {str(e)}")
+            raise NetworkError(f"Failed to connect to Ollama: {str(e)}", cause=e) from e
 
     async def _post(self, endpoint: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """Make a POST request to Ollama API"""
@@ -55,9 +64,33 @@ class OllamaClient:
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
-            raise Exception(f"Ollama API error: {e.response.status_code} - {e.response.text}")
+            raise OllamaError(
+                f"Ollama API error: {e.response.status_code} - {e.response.text}",
+                cause=e,
+            ) from e
+        except OllamaError:
+            raise
         except Exception as e:
-            raise Exception(f"Failed to connect to Ollama: {str(e)}")
+            raise NetworkError(f"Failed to connect to Ollama: {str(e)}", cause=e) from e
+
+    async def _delete(self, endpoint: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Make a DELETE request to Ollama API"""
+        try:
+            response = await self.client.request("DELETE", endpoint, json=data)
+            response.raise_for_status()
+            # DELETE may return empty body on success
+            if response.headers.get("content-length") == "0" or not response.content:
+                return {"status": "success"}
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            raise OllamaError(
+                f"Ollama API error: {e.response.status_code} - {e.response.text}",
+                cause=e,
+            ) from e
+        except OllamaError:
+            raise
+        except Exception as e:
+            raise NetworkError(f"Failed to connect to Ollama: {str(e)}", cause=e) from e
 
     async def list(self) -> Dict[str, Any]:
         """List all available models"""
@@ -69,40 +102,57 @@ class OllamaClient:
 
     async def pull(self, model: str) -> Dict[str, Any]:
         """Pull a model"""
-        return await self._post("/api/pull", {"name": model})
+        return await self._post("/api/pull", {"name": model, "stream": False})
 
     async def push(self, model: str) -> Dict[str, Any]:
         """Push a model"""
-        return await self._post("/api/push", {"name": model})
+        return await self._post("/api/push", {"name": model, "stream": False})
 
     async def copy(self, source: str, destination: str) -> Dict[str, Any]:
         """Copy a model"""
-        return await self._post("/api/copy", {"source": source, "destination": destination})
+        return await self._post(
+            "/api/copy", {"source": source, "destination": destination}
+        )
 
     async def delete(self, model: str) -> Dict[str, Any]:
         """Delete a model"""
-        return await self._post("/api/delete", {"name": model})
+        return await self._delete("/api/delete", {"name": model})
 
-    async def create(self, name: str, modelfile: str, stream: bool = False) -> Dict[str, Any]:
+    async def create(
+        self, name: str, modelfile: str, stream: bool = False
+    ) -> Dict[str, Any]:
         """Create a model from Modelfile"""
         data = {"name": name, "modelfile": modelfile}
         if stream:
             data["stream"] = True
         return await self._post("/api/create", data)
 
-    async def generate(self, model: str, prompt: str, options: Optional[GenerationOptions] = None, stream: bool = False) -> Dict[str, Any]:
+    async def generate(
+        self,
+        model: str,
+        prompt: str,
+        options: Optional[GenerationOptions] = None,
+        stream: bool = False,
+    ) -> Dict[str, Any]:
         """Generate text"""
         data = {"model": model, "prompt": prompt, "stream": stream}
         if options:
             data["options"] = options.model_dump(exclude_unset=True)
         return await self._post("/api/generate", data)
 
-    async def chat(self, model: str, messages: List[ChatMessage], tools: Optional[List[Tool]] = None, options: Optional[GenerationOptions] = None, stream: bool = False) -> Dict[str, Any]:
+    async def chat(
+        self,
+        model: str,
+        messages: List[ChatMessage],
+        tools: Optional[List[Tool]] = None,
+        options: Optional[GenerationOptions] = None,
+        stream: bool = False,
+    ) -> Dict[str, Any]:
         """Chat with a model"""
         data = {
             "model": model,
             "messages": [msg.model_dump(exclude_unset=True) for msg in messages],
-            "stream": stream
+            "stream": stream,
         }
         if tools:
             data["tools"] = [tool.model_dump() for tool in tools]

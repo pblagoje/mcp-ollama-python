@@ -2,7 +2,7 @@
 Ollama embed tool
 """
 
-from typing import Dict, Any, List, Union
+from typing import Dict, Any
 from ..models import ToolDefinition, ResponseFormat, ModelNotFoundError
 from ..ollama_client import OllamaClient
 from ..response_formatter import format_response
@@ -43,7 +43,11 @@ tool_definition = ToolDefinition(
             "input": {
                 "oneOf": [
                     {"type": "string", "description": "Single text string to embed"},
-                    {"type": "array", "items": {"type": "string"}, "description": "Array of text strings to embed"}
+                    {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Array of text strings to embed",
+                    },
                 ],
                 "description": "Text or array of texts to generate embeddings for",
             },

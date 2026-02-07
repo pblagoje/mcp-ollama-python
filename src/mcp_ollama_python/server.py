@@ -4,11 +4,12 @@ MCP Server implementation for Ollama
 
 import json
 from typing import Any, Dict, Optional
+
 try:
     from mcp_ollama_python.ollama_client import OllamaClient
     from mcp_ollama_python.autoloader import discover_tools_with_handlers, ToolRegistry
     from mcp_ollama_python.models import ResponseFormat
-except ImportError as e:
+except ImportError:
     from .ollama_client import OllamaClient
     from .autoloader import discover_tools_with_handlers, ToolRegistry
     from .models import ResponseFormat
@@ -57,7 +58,11 @@ class OllamaMCPServer:
 
             # Determine format from args
             format_arg = args.get("format", "json")
-            response_format = ResponseFormat.MARKDOWN if format_arg == "markdown" else ResponseFormat.JSON
+            response_format = (
+                ResponseFormat.MARKDOWN
+                if format_arg == "markdown"
+                else ResponseFormat.JSON
+            )
 
             # Call the tool handler directly
             result = await handler(self.ollama_client, args, response_format)
@@ -98,20 +103,20 @@ class OllamaMCPServer:
                 "uri": "ollama://models",
                 "name": "Available Models",
                 "description": "List of all available Ollama models",
-                "mimeType": "application/json"
+                "mimeType": "application/json",
             },
             "ollama://running": {
                 "uri": "ollama://running",
                 "name": "Running Models",
                 "description": "List of currently running models",
-                "mimeType": "application/json"
+                "mimeType": "application/json",
             },
             "ollama://config": {
                 "uri": "ollama://config",
                 "name": "Ollama Configuration",
                 "description": "Current Ollama server configuration",
-                "mimeType": "application/json"
-            }
+                "mimeType": "application/json",
+            },
         }
 
     def _initialize_default_prompts(self):
@@ -124,9 +129,9 @@ class OllamaMCPServer:
                     {
                         "name": "detail_level",
                         "description": "Level of detail: basic, intermediate, or advanced",
-                        "required": False
+                        "required": False,
                     }
-                ]
+                ],
             },
             "code_review": {
                 "name": "code_review",
@@ -135,14 +140,14 @@ class OllamaMCPServer:
                     {
                         "name": "language",
                         "description": "Programming language",
-                        "required": True
+                        "required": True,
                     },
                     {
                         "name": "focus",
                         "description": "Focus areas: security, performance, style, or all",
-                        "required": False
-                    }
-                ]
+                        "required": False,
+                    },
+                ],
             },
             "hello_world": {
                 "name": "hello_world",
@@ -151,10 +156,10 @@ class OllamaMCPServer:
                     {
                         "name": "language",
                         "description": "Programming language",
-                        "required": True
+                        "required": True,
                     }
-                ]
-            }
+                ],
+            },
         }
 
     async def handle_list_resources(self) -> Dict[str, Any]:
@@ -165,7 +170,7 @@ class OllamaMCPServer:
                     "uri": resource["uri"],
                     "name": resource["name"],
                     "description": resource["description"],
-                    "mimeType": resource.get("mimeType", "text/plain")
+                    "mimeType": resource.get("mimeType", "text/plain"),
                 }
                 for resource in self._resources.values()
             ]
@@ -187,7 +192,7 @@ class OllamaMCPServer:
             elif uri == "ollama://config":
                 config_data = {
                     "host": self.ollama_client.host,
-                    "has_api_key": bool(self.ollama_client.api_key)
+                    "has_api_key": bool(self.ollama_client.api_key),
                 }
                 content = json.dumps(config_data, indent=2)
             else:
@@ -198,7 +203,7 @@ class OllamaMCPServer:
                     {
                         "uri": uri,
                         "mimeType": self._resources[uri].get("mimeType", "text/plain"),
-                        "text": content
+                        "text": content,
                     }
                 ]
             }
@@ -210,10 +215,10 @@ class OllamaMCPServer:
                     {
                         "uri": uri,
                         "mimeType": "text/plain",
-                        "text": f"Error reading resource: {error_message}"
+                        "text": f"Error reading resource: {error_message}",
                     }
                 ],
-                "isError": True
+                "isError": True,
             }
 
     async def handle_list_prompts(self) -> Dict[str, Any]:
@@ -223,13 +228,15 @@ class OllamaMCPServer:
                 {
                     "name": prompt["name"],
                     "description": prompt["description"],
-                    "arguments": prompt.get("arguments", [])
+                    "arguments": prompt.get("arguments", []),
                 }
                 for prompt in self._prompts.values()
             ]
         }
 
-    async def handle_get_prompt(self, name: str, arguments: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    async def handle_get_prompt(
+        self, name: str, arguments: Optional[Dict[str, str]] = None
+    ) -> Dict[str, Any]:
         """Handle get_prompt request"""
         try:
             if name not in self._prompts:
@@ -270,14 +277,8 @@ Include:
             return {
                 "description": prompt_def["description"],
                 "messages": [
-                    {
-                        "role": "user",
-                        "content": {
-                            "type": "text",
-                            "text": prompt_text
-                        }
-                    }
-                ]
+                    {"role": "user", "content": {"type": "text", "text": prompt_text}}
+                ],
             }
 
         except Exception as error:
