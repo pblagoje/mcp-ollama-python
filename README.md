@@ -84,8 +84,6 @@ poetry run mcp-ollama-python
 ```
 
 ## 🛠️ Generate a Windows executable if you specifically need it; otherwise, this step can be skipped.
-cd ...mcp-ollama-python
-
 poetry run pyinstaller mcp-ollama-python.spec --clean --distpath bin
 
 ## 🛠️ Available Tools
