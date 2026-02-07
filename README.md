@@ -83,7 +83,7 @@ poetry install
 poetry run mcp-ollama-python
 ```
 
-## 🛠️ Create Win11 exe only if you wish to use a Windows executable, otherwise it is not needed.
+## 🛠️ Generate a Windows executable if you specifically need it; otherwise, this step can be skipped.
 cd ...mcp-ollama-python
 
 poetry run pyinstaller mcp-ollama-python.spec --clean --distpath bin
