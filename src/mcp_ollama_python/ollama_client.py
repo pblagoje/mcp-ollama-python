@@ -3,8 +3,9 @@ Ollama HTTP client wrapper
 """
 
 import os
-import httpx
 from typing import Any, Dict, List, Optional, Union
+
+import httpx
 
 try:
     from mcp_ollama_python.models import (
@@ -160,9 +161,11 @@ class OllamaClient:
             data["options"] = options.model_dump(exclude_unset=True)
         return await self._post("/api/chat", data)
 
-    async def embed(self, model: str, input: Union[str, List[str]]) -> Dict[str, Any]:
+    async def embed(
+        self, model: str, input_text: Union[str, List[str]]
+    ) -> Dict[str, Any]:
         """Generate embeddings"""
-        return await self._post("/api/embed", {"model": model, "input": input})
+        return await self._post("/api/embed", {"model": model, "input": input_text})
 
     async def ps(self) -> Dict[str, Any]:
         """List running models"""
