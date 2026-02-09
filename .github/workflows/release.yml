@@ -4,7 +4,8 @@ on:
   push:
     tags:
       - "v*"        # triggers when you push a tag like v1.2.3
-
+  workflow_dispatch:
+  
 jobs:
   build:
     runs-on: windows-latest
