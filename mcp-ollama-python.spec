@@ -2,6 +2,91 @@
 # from terminal/cli, run: poetry shell & pyinstaller mcp-ollama-python.spec --clean --distpath bin
 # or from poetry, run: poetry run pyinstaller mcp-ollama-python.spec --clean --distpath bin
 
+import os
+import platform
+import re
+import struct
+from pathlib import Path
+
+# ---------------------------------------------------------------------------
+# Read version from pyproject.toml
+# ---------------------------------------------------------------------------
+_pyproject = Path(SPECPATH) / "pyproject.toml"
+try:
+    import tomllib
+    _version_str = tomllib.loads(_pyproject.read_text(encoding="utf-8"))["tool"]["poetry"]["version"]
+except Exception:
+    _m = re.search(r'^version\s*=\s*["\']([^"\']+)["\']', _pyproject.read_text(encoding="utf-8"), re.MULTILINE)
+    _version_str = _m.group(1) if _m else "0.0.0"
+
+_ver_parts = [int(x) for x in _version_str.split(".")]
+while len(_ver_parts) < 4:
+    _ver_parts.append(0)
+_ver_tuple = tuple(_ver_parts[:4])
+
+from PyInstaller.utils.win32.versioninfo import (
+    FixedFileInfo,
+    StringFileInfo,
+    StringStruct,
+    StringTable,
+    VarFileInfo,
+    VarStruct,
+    VSVersionInfo,
+)
+
+_version_info = VSVersionInfo(
+    ffi=FixedFileInfo(
+        filevers=_ver_tuple,
+        prodvers=_ver_tuple,
+        mask=0x3F,
+        flags=0x0,
+        OS=0x40004,
+        fileType=0x1,
+        subtype=0x0,
+        date=(0, 0),
+    ),
+    kids=[
+        StringFileInfo(
+            [
+                StringTable(
+                    "040904B0",
+                    [
+                        StringStruct("CompanyName", "Pedja Blagojevic"),
+                        StringStruct("FileDescription", "MCP Ollama Python Server"),
+                        StringStruct("FileVersion", _version_str),
+                        StringStruct("InternalName", "mcp-ollama-python"),
+                        StringStruct("OriginalFilename", "mcp-ollama-python.exe"),
+                        StringStruct("ProductName", "MCP Ollama Python"),
+                        StringStruct("ProductVersion", _version_str),
+                    ],
+                )
+            ]
+        ),
+        VarFileInfo([VarStruct("Translation", [1033, 1200])]),
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Detect OS and architecture for the EXE filename
+# ---------------------------------------------------------------------------
+_arch = "x64" if struct.calcsize("P") * 8 == 64 else "x86"
+
+_os_tag = os.environ.get("MCP_OS_TAG", "")
+if not _os_tag:
+    if platform.system() == "Windows":
+        _win_ver = platform.version()  # e.g. "10.0.22631"
+        _build = int(_win_ver.split(".")[-1]) if _win_ver else 0
+        if _build >= 22000:
+            _os_tag = "win11"
+        else:
+            _os_tag = "win10"
+    elif platform.system() == "Darwin":
+        _os_tag = f"macos{platform.mac_ver()[0]}"
+    else:
+        _os_tag = "linux"
+
+_exe_name = f"mcp-ollama-python-{_version_str}-{_os_tag}-{_arch}"
+
 block_cipher = None
 
 a = Analysis(
@@ -85,7 +170,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='mcp-ollama-python',
+    name=_exe_name,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -99,4 +184,5 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon=None,
+    version=_version_info,
 )

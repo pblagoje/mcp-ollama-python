@@ -1,25 +1,75 @@
----
-description: Quick reference for Windsurf MCP tools (mcp-ollama)
----
+# Available Tools
 
-# MCP Tools (mcp-ollama)
+The Ollama MCP server exposes 8 comprehensive tools for interacting with your local Ollama models.
 
-Available tools exposed by the local `mcp-ollama-python` server:
+## Model Management
 
-- **ollama_chat** – Interactive chat with models (multi-turn, tool-calling, structured outputs)
-- **ollama_list** – List installed models
-- **ollama_show** – Show details for a specific model
-- **ollama_generate** – Single-prompt text generation
-- **ollama_pull** – Pull a model from a registry
-- **ollama_delete** – Delete a local model
-- **ollama_ps** – List running models
-- **ollama_embed** – Create embeddings for input text
-- **ollama_execute** – Execute a system command via the server (utility/test)
+| Tool | Description |
+|------|-------------|
+| `ollama_list` | List all available local models |
+| `ollama_show` | Get detailed information about a specific model |
+| `ollama_pull` | Download models from Ollama library |
+| `ollama_delete` | Remove models from local storage |
 
-## How to list tools in Windsurf
-1) Open the command palette and run: `MCP: List Tools`
-2) Or run the MCP tool via the chat with: `/tools`
+## Model Operations
 
-## Notes
-- Server: local Ollama via `mcp-ollama-python`
-- Formats: most tools accept `format` = `json` (default) or `markdown`
+| Tool | Description |
+|------|-------------|
+| `ollama_ps` | List currently running models |
+| `ollama_generate` | Generate text completions |
+| `ollama_chat` | Interactive chat with models (supports tools/functions) |
+| `ollama_embed` | Generate embeddings for text |
+
+## Web Tools (Ollama Cloud — Planned)
+
+| Tool | Description |
+|------|-------------|
+| `ollama_web_search` | Search the web with customizable result limits |
+| `ollama_web_fetch` | Fetch and parse web page content |
+
+## Output Formats
+
+Most tools accept a `format` parameter:
+
+- `json` (default) — Structured JSON output
+- `markdown` — Human-readable Markdown output
+
+## Quick Reference
+
+**List models:**
+```json
+{ "tool": "ollama_list", "arguments": { "format": "markdown" } }
+```
+
+**Chat with a model:**
+```json
+{
+  "tool": "ollama_chat",
+  "arguments": {
+    "model": "llama3.2:latest",
+    "messages": [{ "role": "user", "content": "Hello!" }]
+  }
+}
+```
+
+**Generate text:**
+```json
+{
+  "tool": "ollama_generate",
+  "arguments": {
+    "model": "llama3.1",
+    "prompt": "Explain quantum computing in simple terms"
+  }
+}
+```
+
+**Generate embeddings:**
+```json
+{
+  "tool": "ollama_embed",
+  "arguments": {
+    "model": "nomic-embed-text",
+    "input": ["Hello world", "Embeddings are great"]
+  }
+}
+```

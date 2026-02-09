@@ -259,6 +259,6 @@ The server responds to the following signals:
 
 ## See Also
 
-- [README.md](README.md) - Main documentation
-- [Architecture](README.md#-architecture) - Server architecture details
-- [Available Tools](README.md#-available-tools) - List of MCP tools
+- [Home](index.md) - Main documentation
+- [Architecture](architecture.md) - Server architecture details
+- [Available Tools](tools.md) - List of MCP tools
