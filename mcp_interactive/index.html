@@ -1,0 +1,2866 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Python MCP server that exposes local Ollama models as tools for AI assistants">
+      
+      
+        <meta name="author" content="Pedja Blagojevic">
+      
+      
+        <link rel="canonical" href="https://pblagoje.github.io/mcp-ollama-python/mcp_interactive/">
+      
+      
+        <link rel="prev" href="../SERVER_CONTROL/">
+      
+      
+        <link rel="next" href="../architecture/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Interactive Manager - Ollama MCP Server (Python)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#mcp-interactive-manager-documentation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Ollama MCP Server (Python)" class="md-header__button md-logo" aria-label="Ollama MCP Server (Python)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Ollama MCP Server (Python)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Interactive Manager
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/pblagoje/mcp-ollama-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    pblagoje/mcp-ollama-python
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Ollama MCP Server (Python)" class="md-nav__button md-logo" aria-label="Ollama MCP Server (Python)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Ollama MCP Server (Python)
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/pblagoje/mcp-ollama-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    pblagoje/mcp-ollama-python
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../windsurf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Windsurf
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vscode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VS Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Server Management
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Server Management
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SERVER_CONTROL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Server Control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interactive Manager
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interactive Manager
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-capabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Capabilities
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#platform-specific-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Platform-Specific Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Software
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Packages
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-poetry-install-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What poetry install does
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-the-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running the Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#basic-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-menu-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main Menu Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Main Menu Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-check-mcp-server-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Check MCP Server Status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-start-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Start Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-stop-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Stop Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-view-server-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. View Server Logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-list-server-commands-and-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. List Server Commands and Arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-manage-environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Manage Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-view-current-environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. View Current Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-run-mcp-command" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Run MCP Command
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-exit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Exit
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Structure
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#directory-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Directory Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#default-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-1-start-server-and-check-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 1: Start Server and Check Status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-2-configure-custom-ollama-host" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 2: Configure Custom Ollama Host
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-3-execute-chat-command" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 3: Execute Chat Command
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-4-view-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 4: View Logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technical-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Technical Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#process-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pipe-file-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pipe File Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stale-file-cleanup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stale File Cleanup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#async-command-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Async Command Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cross-platform-compatibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-Platform Compatibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-server-wont-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Server Won't Start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-stale-pid-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Stale PID File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-cannot-connect-to-ollama" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Cannot Connect to Ollama
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-permission-denied-on-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Permission Denied on Windows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-logs-are-empty" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Logs Are Empty
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-command-execution-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Command Execution Fails
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-poetry-specific-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Poetry-Specific Issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debug-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debug Mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getting-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Help
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-ollama-host" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Ollama Host
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batch-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Batch Operations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-with-other-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration with Other Tools
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Considerations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Tips
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        License
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contributing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contributing
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-capabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Capabilities
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#platform-specific-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Platform-Specific Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Software
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Packages
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-poetry-install-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What poetry install does
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-the-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running the Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#basic-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-menu-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main Menu Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Main Menu Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-check-mcp-server-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Check MCP Server Status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-start-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Start Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-stop-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Stop Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-view-server-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. View Server Logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-list-server-commands-and-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. List Server Commands and Arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-manage-environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Manage Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-view-current-environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. View Current Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-run-mcp-command" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Run MCP Command
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-exit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Exit
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Structure
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#directory-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Directory Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#default-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-1-start-server-and-check-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 1: Start Server and Check Status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-2-configure-custom-ollama-host" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 2: Configure Custom Ollama Host
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-3-execute-chat-command" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 3: Execute Chat Command
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-4-view-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 4: View Logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technical-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Technical Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#process-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pipe-file-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pipe File Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stale-file-cleanup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stale File Cleanup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#async-command-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Async Command Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cross-platform-compatibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-Platform Compatibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-server-wont-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Server Won't Start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-stale-pid-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Stale PID File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-cannot-connect-to-ollama" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Cannot Connect to Ollama
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-permission-denied-on-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Permission Denied on Windows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-logs-are-empty" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Logs Are Empty
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-command-execution-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Command Execution Fails
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-poetry-specific-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Poetry-Specific Issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debug-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debug Mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getting-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Help
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-ollama-host" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Ollama Host
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batch-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Batch Operations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-with-other-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration with Other Tools
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Considerations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Tips
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        License
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contributing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contributing
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="mcp-interactive-manager-documentation">MCP Interactive Manager Documentation</h1>
+<h2 id="overview">Overview</h2>
+<p><code>mcp_interactive.py</code> is an interactive menu-driven Python script that provides comprehensive management and interaction capabilities for the Ollama MCP (Model Context Protocol) Server. It offers a user-friendly terminal interface for server lifecycle management, command execution, environment configuration, and monitoring.</p>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#features">Features</a></li>
+<li><a href="#prerequisites">Prerequisites</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#quick-start">Quick Start</a></li>
+<li><a href="#main-menu-options">Main Menu Options</a></li>
+<li><a href="#file-structure">File Structure</a></li>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#usage-examples">Usage Examples</a></li>
+<li><a href="#technical-details">Technical Details</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+<h2 id="features">Features</h2>
+<h3 id="core-capabilities">Core Capabilities</h3>
+<ul>
+<li><strong>Server Lifecycle Management</strong>: Start, stop, and monitor MCP server processes</li>
+<li><strong>Process Validation</strong>: Intelligent PID file management with process verification using psutil</li>
+<li><strong>Environment Management</strong>: Persistent environment variable configuration</li>
+<li><strong>Interactive Command Execution</strong>: Execute MCP commands with guided parameter input</li>
+<li><strong>Real-time Monitoring</strong>: Server status, Ollama connection, and available models display</li>
+<li><strong>Comprehensive Logging</strong>: Separate log files for standard output and errors</li>
+<li><strong>Cross-Platform Support</strong>: Windows and Unix/Linux compatibility</li>
+<li><strong>Automatic Cleanup</strong>: Stale pipe file and PID file management</li>
+</ul>
+<h3 id="platform-specific-features">Platform-Specific Features</h3>
+<ul>
+<li><strong>Windows</strong>: Uses <code>psutil.Process.terminate()</code> instead of SIGKILL for graceful shutdown</li>
+<li><strong>Unix/Linux</strong>: Standard signal-based process management</li>
+<li><strong>Cross-platform</strong>: Automatic detection and appropriate handling</li>
+</ul>
+<h2 id="prerequisites">Prerequisites</h2>
+<h3 id="software">Software</h3>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Minimum Version</th>
+<th>Why it's needed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Python</strong></td>
+<td><code>3.10</code> or newer</td>
+<td>Project code targets Python 3.10+.</td>
+</tr>
+<tr>
+<td><strong>Poetry</strong></td>
+<td><code>&gt;=1.6</code></td>
+<td>Handles the project's virtual environment and dependencies.</td>
+</tr>
+<tr>
+<td><strong>Ollama</strong></td>
+<td>Latest stable</td>
+<td>Required for the <code>mcp_ollama_python</code> integration.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Tip:</strong> If you don't have Poetry installed, run
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl<span class="w"> </span>-sSL<span class="w"> </span>https://install.python-poetry.org<span class="w"> </span><span class="p">|</span><span class="w"> </span>python3<span class="w"> </span>-
+</code></pre></div>
+or use your system package manager (e.g. <code>brew install poetry</code> on macOS, or <code>pip install poetry</code> on Windows).</p>
+</blockquote>
+<h3 id="python-packages">Python Packages</h3>
+<p>The project's dependencies are declared in <code>pyproject.toml</code>:</p>
+<ul>
+<li><code>httpx &gt;=0.27.0</code></li>
+<li><code>pydantic &gt;=2.7.0</code></li>
+<li><code>rich &gt;=13.7.0</code></li>
+<li><code>mcp &gt;=1.0.0</code></li>
+<li><code>psutil &gt;=7.1.3</code></li>
+</ul>
+<p>No <code>requirements.txt</code> is needed – Poetry takes care of resolving and pinning the exact versions.</p>
+<h2 id="installation">Installation</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># 1. Clone the repository (if you haven&#39;t already)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/your-repo/mcp-ollama-python.git
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nb">cd</span><span class="w"> </span>mcp-ollama-python
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># 2. (Optional) Verify that you are on the right Python version</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>python<span class="w"> </span>--version<span class="w">   </span><span class="c1"># Should print 3.10.x or newer</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="c1"># 3. Install the project&#39;s dependencies and create a virtual environment</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>poetry<span class="w"> </span>install
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="c1"># 4. (Optional) Activate the virtual environment manually</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>poetry<span class="w"> </span>shell
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c1">#   • You&#39;ll now be inside the Poetry-managed venv and can run commands normally.</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="c1"># 5. Verify Ollama is running</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="c1"># Default: http://127.0.0.1:11434</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="c1"># Or custom host via OLLAMA_HOST environment variable</span>
+</code></pre></div>
+<h3 id="what-poetry-install-does">What <code>poetry install</code> does</h3>
+<ol>
+<li><strong>Creates</strong> a fresh virtual environment (if one does not already exist).</li>
+<li><strong>Installs</strong> the exact dependency versions defined in <code>pyproject.toml</code>.</li>
+<li><strong>Sets up</strong> a <code>poetry.lock</code> file to guarantee reproducible installs.</li>
+</ol>
+<blockquote>
+<p><strong>NOTE:</strong> The <code>poetry run</code> command automatically activates the environment for a single command, so you can skip <code>poetry shell</code> if you prefer a one-liner.</p>
+</blockquote>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="running-the-script">Running the Script</h3>
+<p>The recommended way to run the script is via Poetry. Choose one of the two approaches below:</p>
+<p><strong>Option 1 – Run directly with Poetry</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/mcp_interactive.py
+</code></pre></div>
+<p><strong>Option 2 – Activate the Poetry shell first</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>poetry<span class="w"> </span>shell
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python<span class="w"> </span>scripts/mcp_interactive.py
+</code></pre></div>
+<p>Both commands start the virtual environment automatically and execute the <code>mcp_interactive.py</code> script from the <code>scripts</code> directory.</p>
+<h3 id="basic-workflow">Basic Workflow</h3>
+<ol>
+<li><strong>Check Status</strong> (Option 1): Verify Ollama connection and available models</li>
+<li><strong>Start Server</strong> (Option 2): Launch the MCP server in the background</li>
+<li><strong>Run Commands</strong> (Option 8): Execute MCP tools interactively</li>
+<li><strong>View Logs</strong> (Option 4): Monitor server output and errors</li>
+<li><strong>Stop Server</strong> (Option 3): Gracefully shutdown the server</li>
+</ol>
+<h2 id="main-menu-options">Main Menu Options</h2>
+<p>The interactive menu provides 9 main options:</p>
+<h3 id="1-check-mcp-server-status">1. Check MCP Server Status</h3>
+<p>Displays comprehensive server and Ollama connection information:</p>
+<ul>
+<li><strong>Server Status</strong>: Running/Not Running with PID</li>
+<li><strong>PID File Location</strong>: Path to the PID file in <code>tmp/</code> directory</li>
+<li><strong>Ollama Connection</strong>: Host URL and connection status</li>
+<li><strong>Available Models</strong>: Count and list of first 5 models</li>
+</ul>
+<p><strong>Example Output</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>============================================================
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>SERVER STATUS
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>============================================================
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>✓ Server is RUNNING (PID: 12345)
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>  PID File: C:\myCode\gitHub\mcp-ollama-python\tmp\.mcp_ollama_server.pid
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>Ollama Connection:
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>  Host: http://127.0.0.1:11434
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>  Status: ✓ Connected
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>  Available Models: 21
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>  Models: llama3.1:latest, qwen3-vl:latest, glm4:latest, phi4:latest, llava:latest
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>           ... and 16 more
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>============================================================
+</code></pre></div></p>
+<h3 id="2-start-server">2. Start Server</h3>
+<p>Launches the MCP server as a background process with:</p>
+<ul>
+<li><strong>Automatic Cleanup</strong>: Removes stale pipe files before starting</li>
+<li><strong>Environment Variables</strong>: Applies custom environment configuration</li>
+<li><strong>Logging</strong>: Redirects stdout/stderr to log files</li>
+<li><strong>Process Isolation</strong>: Uses subprocess with proper signal handling</li>
+<li><strong>PID Management</strong>: Creates PID file for process tracking</li>
+</ul>
+<p><strong>Features</strong>:
+- Prevents duplicate server instances
+- Creates pipe file descriptors for graceful shutdown
+- Windows-specific process group creation
+- Automatic log file creation in <code>logs/</code> directory</p>
+<h3 id="3-stop-server">3. Stop Server</h3>
+<p>Gracefully stops the running MCP server:</p>
+<ul>
+<li><strong>Pipe Closure</strong>: Closes pipe file descriptors to signal shutdown</li>
+<li><strong>SIGTERM</strong>: Sends termination signal for graceful exit</li>
+<li><strong>Force Shutdown</strong>: Uses platform-specific force kill if needed (5-second timeout)</li>
+<li><strong>Cleanup</strong>: Removes PID files and stale pipe files</li>
+<li><strong>Verification</strong>: Confirms process termination</li>
+</ul>
+<p><strong>Shutdown Process</strong>:
+1. Close pipe file descriptor
+2. Send SIGTERM signal
+3. Wait up to 5 seconds for graceful shutdown
+4. Force terminate if still running (Windows: psutil, Unix: SIGKILL)
+5. Clean up all temporary files</p>
+<h3 id="4-view-server-logs">4. View Server Logs</h3>
+<p>Displays server log files with detailed information:</p>
+<ul>
+<li><strong>Standard Output Log</strong>: <code>logs/mcp_ollama_server.log</code></li>
+<li><strong>Error Log</strong>: <code>logs/mcp_ollama_server_error.log</code></li>
+<li><strong>File Sizes</strong>: Shows log file sizes for debugging</li>
+<li><strong>UTF-8 Encoding</strong>: Handles encoding issues gracefully</li>
+</ul>
+<p><strong>Features</strong>:
+- Distinguishes between empty and missing log files
+- Shows file paths for manual inspection
+- Error handling for file read operations</p>
+<h3 id="5-list-server-commands-and-arguments">5. List Server Commands and Arguments</h3>
+<p>Discovers and displays all available MCP tools:</p>
+<ul>
+<li><strong>Tool Discovery</strong>: Uses autoloader to find all registered tools</li>
+<li><strong>Detailed Information</strong>: Shows name, description, and arguments</li>
+<li><strong>Argument Details</strong>: Displays type, requirement status, and descriptions</li>
+<li><strong>Schema Inspection</strong>: Shows complete input schema for each tool</li>
+</ul>
+<p><strong>Example Output</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Found 8 tools:
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>1. ollama_list
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>   Description: List all available Ollama models
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>   Arguments:
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>     * format (string): Output format (default: json)
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>2. ollama_chat
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>   Description: Interactive chat with Ollama models
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>   Arguments:
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>     * model (string): Name of the model to use
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>     * messages (array): Array of chat messages
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>       format (string): Output format (default: json)
+</code></pre></div></p>
+<h3 id="6-manage-environment-variables">6. Manage Environment Variables</h3>
+<p>Submenu for comprehensive environment variable management:</p>
+<p><strong>Sub-options</strong>:
+1. <strong>View current environment variables</strong>: Display custom and system variables
+2. <strong>Add/Update environment variable</strong>: Set or modify variables
+3. <strong>Remove environment variable</strong>: Delete custom variables
+4. <strong>Reset to defaults</strong>: Clear all custom variables
+5. <strong>Back to main menu</strong>: Return to main menu</p>
+<p><strong>Common Variables</strong>:
+- <code>OLLAMA_HOST</code>: Ollama server URL (default: http://127.0.0.1:11434)
+- <code>OLLAMA_API_KEY</code>: API key for Ollama (if required)
+- <code>OLLAMA_MODELS</code>: Custom models directory</p>
+<p><strong>Persistence</strong>: Variables are saved to <code>tmp/.mcp_env_vars.json</code></p>
+<h3 id="7-view-current-environment-variables">7. View Current Environment Variables</h3>
+<p>Displays environment configuration:</p>
+<ul>
+<li><strong>Custom Variables</strong>: Variables set through the script</li>
+<li><strong>System Variables</strong>: Ollama-related system environment variables</li>
+<li><strong>Suggestions</strong>: Common variables you might want to set</li>
+</ul>
+<h3 id="8-run-mcp-command">8. Run MCP Command</h3>
+<p>Interactive command execution with guided parameter input:</p>
+<p><strong>Workflow</strong>:
+1. <strong>Tool Selection</strong>: Choose from available MCP tools
+2. <strong>Parameter Input</strong>: Guided prompts for each required/optional parameter
+3. <strong>Format Selection</strong>: Choose JSON or Markdown output
+4. <strong>Execution</strong>: Run the command with provided parameters
+5. <strong>Result Display</strong>: Show formatted output</p>
+<p><strong>Special Handling</strong>:
+- <strong>Chat Messages</strong>: Simplified input for chat message arrays
+- <strong>Arrays</strong>: Comma-separated value input
+- <strong>Objects</strong>: JSON format input with validation
+- <strong>Required vs Optional</strong>: Clear indicators for parameter requirements</p>
+<p><strong>Example Session</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Available commands (8):
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>1. ollama_list
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>   List all available Ollama models
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>Select command number: 1
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>Arguments:
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>  format (string) [OPTIONAL]
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>  Output format (default: json)
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>  Enter value: json
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>Output format:
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>  1. JSON
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>  2. Markdown
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>Select format (1 or 2, default: 1): 1
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>============================================================
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>EXECUTING COMMAND...
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>============================================================
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>
+<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>RESULT:
+<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>{
+<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a>  &quot;models&quot;: [...]
+<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a>}
+<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a>
+<a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a>✓ Command executed successfully.
+</code></pre></div></p>
+<h3 id="9-exit">9. Exit</h3>
+<p>Cleanly exits the application.</p>
+<h2 id="file-structure">File Structure</h2>
+<p>The script manages files in organized directories:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>mcp-ollama-python/
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>├── scripts/
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>│   └── mcp_interactive.py          # Main script
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>├── tmp/                             # Temporary files (auto-created)
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>│   ├── .mcp_ollama_server.pid      # Server process ID
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>│   ├── .mcp_ollama_server_*.pipe   # Pipe file descriptors
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>│   └── .mcp_env_vars.json          # Persistent environment variables
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>├── logs/                            # Log files (auto-created)
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>│   ├── mcp_ollama_server.log       # Standard output
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>│   └── mcp_ollama_server_error.log # Error output
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>└── src/
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>    └── mcp_ollama_python/           # MCP server package
+</code></pre></div>
+<h3 id="directory-management">Directory Management</h3>
+<ul>
+<li><strong>Automatic Creation</strong>: <code>tmp/</code> and <code>logs/</code> directories are created automatically</li>
+<li><strong>Cleanup</strong>: Stale pipe files are automatically removed</li>
+<li><strong>Persistence</strong>: Environment variables persist across sessions</li>
+</ul>
+<h2 id="configuration">Configuration</h2>
+<h3 id="environment-variables">Environment Variables</h3>
+<p>Set custom environment variables through the menu (Option 6) or directly in <code>tmp/.mcp_env_vars.json</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;OLLAMA_HOST&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://ai:11434/&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">&quot;OLLAMA_API_KEY&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your-api-key-here&quot;</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="default-configuration">Default Configuration</h3>
+<ul>
+<li><strong>Ollama Host</strong>: <code>http://127.0.0.1:11434</code> (or <code>OLLAMA_HOST</code> env var)</li>
+<li><strong>Log Directory</strong>: <code>logs/</code> (relative to project root)</li>
+<li><strong>Temp Directory</strong>: <code>tmp/</code> (relative to project root)</li>
+<li><strong>Server Timeout</strong>: 5 seconds for graceful shutdown</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="example-1-start-server-and-check-status">Example 1: Start Server and Check Status</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Run the script</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>python<span class="w"> </span>mcp_interactive.py
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Select option 2 to start server</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>Select<span class="w"> </span>option<span class="w"> </span><span class="o">(</span><span class="m">1</span>-9<span class="o">)</span>:<span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># Wait for confirmation</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>✓<span class="w"> </span>Server<span class="w"> </span>started<span class="w"> </span>successfully<span class="w"> </span><span class="o">(</span>PID:<span class="w"> </span><span class="m">12345</span><span class="o">)</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="c1"># Select option 1 to check status</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>Select<span class="w"> </span>option<span class="w"> </span><span class="o">(</span><span class="m">1</span>-9<span class="o">)</span>:<span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="c1"># View status information</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>✓<span class="w"> </span>Server<span class="w"> </span>is<span class="w"> </span>RUNNING<span class="w"> </span><span class="o">(</span>PID:<span class="w"> </span><span class="m">12345</span><span class="o">)</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>Ollama<span class="w"> </span>Connection:<span class="w"> </span>✓<span class="w"> </span>Connected
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>Available<span class="w"> </span>Models:<span class="w"> </span><span class="m">21</span>
+</code></pre></div>
+<h3 id="example-2-configure-custom-ollama-host">Example 2: Configure Custom Ollama Host</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Select option 6 (Manage environment variables)</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>Select<span class="w"> </span>option<span class="w"> </span><span class="o">(</span><span class="m">1</span>-9<span class="o">)</span>:<span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Select option 2 (Add/Update environment variable)</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>Select<span class="w"> </span>option<span class="w"> </span><span class="o">(</span><span class="m">1</span>-5<span class="o">)</span>:<span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># Enter variable name</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>Enter<span class="w"> </span>variable<span class="w"> </span>name:<span class="w"> </span>OLLAMA_HOST
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="c1"># Enter value</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>Enter<span class="w"> </span>value<span class="w"> </span><span class="k">for</span><span class="w"> </span>OLLAMA_HOST:<span class="w"> </span>http://ai:11434/
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>✓<span class="w"> </span>Set<span class="w"> </span><span class="nv">OLLAMA_HOST</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>http://ai:11434/
+</code></pre></div>
+<h3 id="example-3-execute-chat-command">Example 3: Execute Chat Command</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Select option 8 (Run MCP command)</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>Select<span class="w"> </span>option<span class="w"> </span><span class="o">(</span><span class="m">1</span>-9<span class="o">)</span>:<span class="w"> </span><span class="m">8</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># Select ollama_chat</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>Select<span class="w"> </span><span class="nb">command</span><span class="w"> </span>number:<span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="c1"># Enter model name</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>model<span class="w"> </span><span class="o">(</span>string<span class="o">)</span><span class="w"> </span><span class="o">[</span>REQUIRED<span class="o">]</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>Enter<span class="w"> </span>value:<span class="w"> </span>llava:latest
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="c1"># Enter message</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>messages<span class="w"> </span><span class="o">(</span>array<span class="o">)</span><span class="w"> </span><span class="o">[</span>REQUIRED<span class="o">]</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>Enter<span class="w"> </span>your<span class="w"> </span>message:<span class="w"> </span>Explain<span class="w"> </span>what<span class="w"> </span>MCP<span class="w"> </span>is
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="c1"># Select output format</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>Select<span class="w"> </span>format<span class="w"> </span><span class="o">(</span><span class="m">1</span><span class="w"> </span>or<span class="w"> </span><span class="m">2</span>,<span class="w"> </span>default:<span class="w"> </span><span class="m">1</span><span class="o">)</span>:<span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a><span class="c1"># View result in Markdown format</span>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a>RESULT:
+<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a>MCP<span class="w"> </span><span class="o">(</span>Model<span class="w"> </span>Context<span class="w"> </span>Protocol<span class="o">)</span><span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>standardized<span class="w"> </span>protocol...
+<a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a>
+<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a>✓<span class="w"> </span>Command<span class="w"> </span>executed<span class="w"> </span>successfully.
+</code></pre></div>
+<h3 id="example-4-view-logs">Example 4: View Logs</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Select option 4 (View server logs)</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>Select<span class="w"> </span>option<span class="w"> </span><span class="o">(</span><span class="m">1</span>-9<span class="o">)</span>:<span class="w"> </span><span class="m">4</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># View log content</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>Log<span class="w"> </span>file:<span class="w"> </span>C:<span class="se">\m</span>yCode<span class="se">\g</span>itHub<span class="se">\m</span>cp-ollama-python<span class="se">\l</span>ogs<span class="se">\m</span>cp_ollama_server.log
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>Log<span class="w"> </span>content:
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>Starting<span class="w"> </span>Ollama<span class="w"> </span>MCP<span class="w"> </span>Server...
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>Server<span class="w"> </span>started<span class="w"> </span>successfully!
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>MCP<span class="w"> </span>client<span class="w"> </span>connections...
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>File<span class="w"> </span>Information:
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">  </span>Log<span class="w"> </span>file<span class="w"> </span>size:<span class="w"> </span><span class="m">156</span><span class="w"> </span>bytes
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="w">  </span>Error<span class="w"> </span>log<span class="w"> </span>file<span class="w"> </span>size:<span class="w"> </span><span class="m">0</span><span class="w"> </span>bytes
+</code></pre></div>
+<h2 id="technical-details">Technical Details</h2>
+<h3 id="process-management">Process Management</h3>
+<p><strong>PID Validation</strong>:
+- Uses <code>psutil.Process()</code> to verify process existence
+- Checks command line for <code>mcp_ollama_python</code> to confirm identity
+- Automatically cleans up stale PID files</p>
+<p><strong>Process Creation</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Windows-specific flags</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">creationflags</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CREATE_NEW_PROCESS_GROUP</span> <span class="o">|</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CREATE_NO_WINDOW</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># Unix: start_new_session=True</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;mcp_ollama_python&quot;</span><span class="p">],</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    <span class="n">stdin</span><span class="o">=</span><span class="n">stdin_read</span><span class="p">,</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>    <span class="n">stdout</span><span class="o">=</span><span class="n">log_file</span><span class="p">,</span>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>    <span class="n">stderr</span><span class="o">=</span><span class="n">error_log_file</span><span class="p">,</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>    <span class="n">start_new_session</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>    <span class="n">creationflags</span><span class="o">=</span><span class="n">creationflags</span>  <span class="c1"># Windows only</span>
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="p">)</span>
+</code></pre></div></p>
+<h3 id="pipe-file-management">Pipe File Management</h3>
+<p><strong>Purpose</strong>: Enable graceful server shutdown by closing stdin</p>
+<p><strong>Implementation</strong>:
+1. Create pipe: <code>stdin_read, stdin_write = os.pipe()</code>
+2. Pass read end to subprocess
+3. Store write end in <code>tmp/.mcp_ollama_server_{pid}.pipe</code>
+4. Close write end during shutdown to signal EOF</p>
+<h3 id="stale-file-cleanup">Stale File Cleanup</h3>
+<p><strong>Automatic Cleanup</strong>:
+- Runs on server start, stop, and status check
+- Removes pipe files for non-existent processes
+- Removes pipe files for processes that aren't MCP servers
+- Handles invalid filename formats gracefully</p>
+<h3 id="async-command-execution">Async Command Execution</h3>
+<p><strong>Architecture</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">execute_command</span><span class="p">():</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="n">ollama_client</span> <span class="o">=</span> <span class="n">OllamaClient</span><span class="p">()</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="n">server</span> <span class="o">=</span> <span class="n">OllamaMCPServer</span><span class="p">(</span><span class="n">ollama_client</span><span class="p">)</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="c1"># Get tools and execute</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="n">tools_result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">server</span><span class="o">.</span><span class="n">handle_list_tools</span><span class="p">()</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">server</span><span class="o">.</span><span class="n">handle_call_tool</span><span class="p">(</span><span class="n">tool_name</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    <span class="c1"># Cleanup</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>    <span class="k">await</span> <span class="n">ollama_client</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">aclose</span><span class="p">()</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">execute_command</span><span class="p">())</span>
+</code></pre></div></p>
+<h3 id="cross-platform-compatibility">Cross-Platform Compatibility</h3>
+<p><strong>Windows</strong>:
+- Uses <code>psutil.Process.terminate()</code> for force shutdown
+- Requires <code>CREATE_NEW_PROCESS_GROUP</code> flag
+- No SIGKILL signal available</p>
+<p><strong>Unix/Linux</strong>:
+- Uses <code>signal.SIGTERM</code> for graceful shutdown
+- Uses <code>signal.SIGKILL</code> for force shutdown
+- Standard signal handling</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="common-issues">Common Issues</h3>
+<h4 id="1-server-wont-start">1. Server Won't Start</h4>
+<p><strong>Symptoms</strong>: Server fails to start, error in logs</p>
+<p><strong>Solutions</strong>:
+- Check if Ollama is running: <code>curl http://localhost:11434/api/tags</code>
+- Verify Python version: <code>python --version</code> (requires 3.10+)
+- Ensure Poetry dependencies are installed: <code>poetry install</code>
+- Check for port conflicts
+- Review error log: <code>logs/mcp_ollama_server_error.log</code>
+- Verify you're running with Poetry: <code>poetry run python scripts/mcp_interactive.py</code></p>
+<h4 id="2-stale-pid-file">2. Stale PID File</h4>
+<p><strong>Symptoms</strong>: Script says server is running but it's not</p>
+<p><strong>Solutions</strong>:
+- The script automatically detects and cleans stale PID files
+- If issue persists, manually delete: <code>tmp/.mcp_ollama_server.pid</code>
+- Run status check (Option 1) to trigger cleanup</p>
+<h4 id="3-cannot-connect-to-ollama">3. Cannot Connect to Ollama</h4>
+<p><strong>Symptoms</strong>: "Cannot connect" error when checking status</p>
+<p><strong>Solutions</strong>:
+- Verify Ollama is running: <code>ollama list</code>
+- Check OLLAMA_HOST environment variable
+- Test connection: <code>curl http://localhost:11434/api/tags</code>
+- Configure custom host via Option 6</p>
+<h4 id="4-permission-denied-on-windows">4. Permission Denied on Windows</h4>
+<p><strong>Symptoms</strong>: Cannot terminate process or delete files</p>
+<p><strong>Solutions</strong>:
+- Run as Administrator
+- Close any file handles to log files
+- Wait a few seconds and try again
+- Check antivirus software isn't blocking</p>
+<h4 id="5-logs-are-empty">5. Logs Are Empty</h4>
+<p><strong>Symptoms</strong>: Log files exist but contain no content</p>
+<p><strong>Solutions</strong>:
+- Server may still be starting (wait a few seconds)
+- Check file permissions on <code>logs/</code> directory
+- Verify server is actually running (Option 1)
+- Check error log for startup issues</p>
+<h4 id="6-command-execution-fails">6. Command Execution Fails</h4>
+<p><strong>Symptoms</strong>: MCP command returns error</p>
+<p><strong>Solutions</strong>:
+- Verify model name is correct: Use Option 5 to list available tools
+- Check required parameters are provided
+- Ensure Ollama has the specified model: <code>ollama list</code>
+- Review command syntax in tool description</p>
+<h4 id="7-poetry-specific-issues">7. Poetry-Specific Issues</h4>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>poetry: command not found</code></strong></td>
+<td>Poetry is not installed or the binary is not on the PATH.</td>
+<td>Install Poetry (e.g. <code>curl -sSL https://install.python-poetry.org | python3 -</code>) and add <code>~/.local/bin</code> (or the install prefix) to your <code>PATH</code>. Verify with <code>poetry --version</code>.</td>
+</tr>
+<tr>
+<td><strong>Python version mismatch (<code>3.10+ required</code>)</strong></td>
+<td>The current interpreter is older than the version required by the project.</td>
+<td>Switch to a supported Python version (e.g., <code>pyenv install 3.12.0 &amp;&amp; pyenv local 3.12.0</code>) or update the <code>python</code> key in <code>pyproject.toml</code> and re-run <code>poetry env use &lt;python&gt;</code>.</td>
+</tr>
+<tr>
+<td><strong><code>poetry.lock</code> conflicts or stale lock file</strong></td>
+<td>The lock file was generated with a different Poetry version or after changes to dependencies.</td>
+<td>Delete the lock file (<code>rm poetry.lock</code>), run <code>poetry lock</code> to regenerate it, and then <code>poetry install</code>. If the conflict is due to a specific dependency, adjust the version specifier in <code>pyproject.toml</code> before locking again.</td>
+</tr>
+<tr>
+<td><strong>Virtual environment issues (env not created / missing packages)</strong></td>
+<td>Poetry is unable to create or activate the virtual environment, often due to missing system packages or an incorrectly configured setting.</td>
+<td>Ensure build tools are installed (<code>sudo apt install build-essential libffi-dev python3-dev</code> on Debian/Ubuntu, or Visual C++ Build Tools on Windows). If the env exists but is corrupted, delete it (<code>poetry env remove &lt;name&gt;</code>), then run <code>poetry install</code> to recreate.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="debug-mode">Debug Mode</h3>
+<p>For detailed debugging:</p>
+<ol>
+<li><strong>Check Process</strong>: <code>ps aux | grep mcp_ollama_python</code> (Unix) or Task Manager (Windows)</li>
+<li><strong>Manual Cleanup</strong>: Delete files in <code>tmp/</code> directory</li>
+<li><strong>View Raw Logs</strong>: Open log files directly in text editor</li>
+<li><strong>Test Ollama</strong>: <code>curl http://localhost:11434/api/tags</code></li>
+</ol>
+<h3 id="getting-help">Getting Help</h3>
+<p>If issues persist:</p>
+<ol>
+<li>Check server logs (Option 4)</li>
+<li>Verify Ollama connection (Option 1)</li>
+<li>Review environment variables (Option 7)</li>
+<li>Check GitHub issues for similar problems</li>
+<li>Provide log files when reporting issues</li>
+</ol>
+<h2 id="advanced-usage">Advanced Usage</h2>
+<h3 id="custom-ollama-host">Custom Ollama Host</h3>
+<p>For remote Ollama servers:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Set via environment variable management (Option 6)</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nv">OLLAMA_HOST</span><span class="o">=</span>http://remote-server:11434/
+</code></pre></div>
+<h3 id="batch-operations">Batch Operations</h3>
+<p>While the script is interactive, you can script operations:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Start server programmatically</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;from mcp_interactive import MCPInteractive; m = MCPInteractive(); m.start_server()&quot;</span>
+</code></pre></div>
+<h3 id="integration-with-other-tools">Integration with Other Tools</h3>
+<p>The MCP server can be used by:
+- Claude Desktop
+- Cline VSCode Extension
+- Custom MCP clients
+- API integrations</p>
+<h2 id="security-considerations">Security Considerations</h2>
+<ul>
+<li><strong>API Keys</strong>: Store sensitive keys in environment variables, not in code</li>
+<li><strong>Network Access</strong>: Configure firewall rules for Ollama host</li>
+<li><strong>Process Isolation</strong>: Server runs in separate process for security</li>
+<li><strong>Log Files</strong>: May contain sensitive information, protect accordingly</li>
+</ul>
+<h2 id="performance-tips">Performance Tips</h2>
+<ul>
+<li><strong>Model Selection</strong>: Smaller models respond faster</li>
+<li><strong>Log Rotation</strong>: Periodically clear old log files</li>
+<li><strong>Resource Monitoring</strong>: Check system resources if server is slow</li>
+<li><strong>Network Latency</strong>: Use local Ollama instance for best performance</li>
+</ul>
+<h2 id="license">License</h2>
+<p>This script is part of the mcp-ollama-python project. See the main project LICENSE file for details.</p>
+<h2 id="contributing">Contributing</h2>
+<p>Contributions are welcome! Please see the main project CONTRIBUTING.md for guidelines.</p>
+<hr />
+<p><strong>Last Updated</strong>: December 2025
+<strong>Version</strong>: 1.0
+<strong>Maintained By</strong>: mcp-ollama-python contributors</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.top", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
