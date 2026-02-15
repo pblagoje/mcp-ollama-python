@@ -181,3 +181,4 @@ cython_debug/
 .cursorindexingignore
 /bin
 /tmp
+scripts/nssm.exe
