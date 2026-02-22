@@ -30,6 +30,8 @@ MIME_TYPE_TEXT = "text/plain"
 PROMPT_EXPLAIN_LORA = "explain_lora"
 PROMPT_CODE_REVIEW = "code_review"
 PROMPT_HELLO_WORLD = "hello_world"
+PROMPT_EXPLAIN_CODE = "explain_code"
+PROMPT_WRITE_DOCSTRING = "write_docstring"
 
 
 @dataclass
@@ -194,11 +196,6 @@ class OllamaMCPServer:
                         "description": "Programming language",
                         "required": True,
                     },
-                    {
-                        "name": "focus",
-                        "description": "Focus areas: security, performance, style, or all",
-                        "required": False,
-                    },
                 ],
             ),
             PROMPT_HELLO_WORLD: PromptDefinition(
@@ -210,6 +207,43 @@ class OllamaMCPServer:
                         "description": "Programming language",
                         "required": True,
                     }
+                ],
+            ),
+            PROMPT_EXPLAIN_CODE: PromptDefinition(
+                name=PROMPT_EXPLAIN_CODE,
+                description="Explain what a code snippet does in detail",
+                arguments=[
+                    {
+                        "name": "code",
+                        "description": "The code snippet to explain",
+                        "required": True,
+                    },
+                    {
+                        "name": "language",
+                        "description": "Programming language of the code",
+                        "required": False,
+                    },
+                ],
+            ),
+            PROMPT_WRITE_DOCSTRING: PromptDefinition(
+                name=PROMPT_WRITE_DOCSTRING,
+                description="Generate comprehensive docstring/documentation for code",
+                arguments=[
+                    {
+                        "name": "code",
+                        "description": "The code to document",
+                        "required": True,
+                    },
+                    {
+                        "name": "language",
+                        "description": "Programming language (e.g., python, javascript, typescript)",
+                        "required": True,
+                    },
+                    {
+                        "name": "style",
+                        "description": "Documentation style (e.g., google, numpy, jsdoc, sphinx)",
+                        "required": False,
+                    },
                 ],
             ),
         }
@@ -234,18 +268,29 @@ class OllamaMCPServer:
 
     async def handle_read_resource(self, uri: str) -> Dict[str, Any]:
         """Handle read_resource request"""
+        # Handle both old and new MCP SDK formats
+        # MCP SDK v1.26.0 might send uri as a dict with 'uri' key
+        actual_uri = uri
+        if isinstance(uri, dict):
+            actual_uri = uri.get("uri", "")
+        elif not isinstance(uri, str):
+            actual_uri = str(uri) if uri else ""
+
         # Validate input
-        if not isinstance(uri, str) or not uri.strip():
+        if not isinstance(actual_uri, str) or not actual_uri.strip():
             return {
                 "contents": [
                     {
-                        "uri": uri,
+                        "uri": actual_uri if isinstance(actual_uri, str) else str(uri),
                         "mimeType": MIME_TYPE_TEXT,
                         "text": "Error reading resource: Invalid URI",
                     }
                 ],
                 "isError": True,
             }
+
+        # Use actual_uri for the rest of the function
+        uri = actual_uri
 
         try:
             if uri not in self._resources:
@@ -335,13 +380,24 @@ Include:
 - Comparison with full fine-tuning"""
             elif name == PROMPT_CODE_REVIEW:
                 language = args.get("language", "Python")
-                focus = args.get("focus", "all")
-                prompt_text = f"""Review the following {language} code with focus on {focus}.
-Provide:
-- Issues found
-- Suggestions for improvement
-- Best practices recommendations
-- Security concerns (if applicable)"""
+                prompt_text = f"""Review the following {language} code with focus on identifying potential bugs and correctness issues.
+You are a senior software engineer performing a deep code review. Your analysis should emphasize:
+
+1. Logic flaws or incorrect behavior
+2. Missing or unhandled edge cases
+3. Null/undefined reference risks
+4. Concurrency or race‑condition vulnerabilities
+5. Security weaknesses
+6. Resource‑management issues or leaks
+7. Violations of API contracts
+8. Incorrect or ineffective caching behavior (staleness, key bugs, invalidation issues)
+9. Inconsistencies with established patterns or conventions
+
+Additional requirements:
+- When exploring the codebase, use multiple tools in parallel for efficiency, but avoid excessive exploration.
+- Report any pre‑existing bugs you discover, not just those introduced by the changes.
+- Do not include speculative or low‑confidence findings; base conclusions on a solid understanding of the code.
+- Be aware that the referenced commit may not reflect the current local checkout state."""
             elif name == PROMPT_HELLO_WORLD:
                 language = args.get("language", "Python")
                 prompt_text = f"""Write a complete, well-commented Hello World program in {language}.
@@ -350,6 +406,56 @@ Include:
 - Comments explaining each part
 - Best practices for the language
 - How to run the program"""
+            elif name == PROMPT_EXPLAIN_CODE:
+                code = args.get("code", "")
+                if not code:
+                    raise ValueError(
+                        "The 'code' parameter is required for explain_code prompt"
+                    )
+                language = args.get("language", "")
+                lang_hint = f" ({language})" if language else ""
+                prompt_text = f"""Explain the following code{lang_hint} in detail:
+
+```
+{code}
+```
+
+Provide a comprehensive explanation that includes:
+1. **Overview**: What does this code do at a high level?
+2. **Step-by-step breakdown**: Explain each significant part
+3. **Key concepts**: What programming concepts or patterns are used?
+4. **Inputs and outputs**: What does it expect and what does it produce?
+5. **Potential issues**: Any edge cases, bugs, or improvements to consider?
+
+Be clear and educational in your explanation."""
+            elif name == PROMPT_WRITE_DOCSTRING:
+                code = args.get("code", "")
+                if not code:
+                    raise ValueError(
+                        "The 'code' parameter is required for write_docstring prompt"
+                    )
+                language = args.get("language", "python")
+                style = args.get("style", "")
+                style_hint = f" in {style} style" if style else ""
+                prompt_text = f"""Generate comprehensive documentation{style_hint} for the following {language} code:
+
+```{language}
+{code}
+```
+
+Requirements:
+1. Write proper docstring/documentation comments appropriate for {language}
+2. Include:
+   - Brief description of what the code does
+   - Parameters/arguments with types and descriptions
+   - Return value with type and description
+   - Exceptions/errors that may be raised
+   - Usage examples if applicable
+   - Any important notes or warnings
+3. Follow {language} documentation conventions{style_hint}
+4. Be clear, concise, and complete
+
+Provide ONLY the documentation/docstring, formatted correctly for insertion into the code."""
             else:
                 prompt_text = f"Prompt template for {name}"
 
