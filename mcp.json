@@ -2,6 +2,12 @@
   "capabilities": {
     "models": [
       {
+        "name": "qwen3-coder:latest",
+        "provider": "ollama",
+        "description": "Qwen3 Coder - 30.5B parameter coding model",
+        "maxTokens": 32768
+      },
+      {
         "name": "gpt-oss",
         "provider": "ollama",
         "description": "Local Ollama GPT-OSS model",
