@@ -2,8 +2,6 @@
 Tests for response_formatter.py - Response formatting utilities
 """
 
-import sys
-import os
 import json
 import pytest
 
@@ -12,7 +10,8 @@ from mcp_ollama_python.response_formatter import (
     format_response,
     json_to_markdown,
     array_to_markdown_table,
-    _format_object_entry
+    _format_object_entry,
+    escape_markdown
 )
 from mcp_ollama_python.models import ResponseFormat
 
@@ -186,29 +185,29 @@ class TestFormatObjectEntry:
 
     def test_simple_value(self):
         """Test formatting simple key-value"""
-        result = _format_object_entry("name", "John", "")
+        result = _format_object_entry("name", "John", "", set(), 0)
         assert "**name:**" in result
         assert "John" in result
 
     def test_underscore_key(self):
         """Test underscore replacement in key"""
-        result = _format_object_entry("first_name", "Jane", "")
+        result = _format_object_entry("first_name", "Jane", "", set(), 0)
         assert "**first name:**" in result
 
     def test_nested_dict_value(self):
         """Test formatting with dict value"""
-        result = _format_object_entry("details", {"inner": "val"}, "")
+        result = _format_object_entry("details", {"inner": "val"}, "", set(), 0)
         assert "**details:**" in result
         assert "**inner:**" in result
 
     def test_nested_list_value(self):
         """Test formatting with list value"""
-        result = _format_object_entry("items", ["a", "b"], "")
+        result = _format_object_entry("items", ["a", "b"], "", set(), 0)
         assert "**items:**" in result
 
     def test_with_indent(self):
         """Test formatting with indent"""
-        result = _format_object_entry("key", "value", "  ")
+        result = _format_object_entry("key", "value", "  ", set(), 0)
         assert result.startswith("  ")
 
 
@@ -230,11 +229,11 @@ class TestIntegration:
             ]
         }
         json_str = json.dumps(data)
-        
+
         # Test JSON format
         json_result = format_response(json_str, ResponseFormat.JSON)
         assert json_result == json_str
-        
+
         # Test markdown format
         md_result = format_response(json_str, ResponseFormat.MARKDOWN)
         assert "**models:**" in md_result
@@ -250,7 +249,7 @@ class TestIntegration:
             "done": True
         }
         json_str = json.dumps(data)
-        
+
         md_result = format_response(json_str, ResponseFormat.MARKDOWN)
         assert "**model:**" in md_result
         assert "**message:**" in md_result
@@ -262,7 +261,7 @@ class TestIntegration:
             "status_code": 404
         }
         json_str = json.dumps(data)
-        
+
         md_result = format_response(json_str, ResponseFormat.MARKDOWN)
         assert "**error:**" in md_result
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mcp-ollama-python"
-version = "1.0.4"
+version = "1.0.5"
 description = "Model Context Protocol server that proxies local Ollama to MCP clients like Windsurf and VS Code"
 authors = ["Pedja Blagojevic <pb@internetics.net>"]
 readme = "README.md"

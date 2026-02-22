@@ -2,30 +2,58 @@
 Ollama embed tool
 """
 
+import logging
 from typing import Dict, Any
 from ..models import ToolDefinition, ResponseFormat, ModelNotFoundError
 from ..ollama_client import OllamaClient
 from ..response_formatter import format_response
 
+logger = logging.getLogger(__name__)
+
 
 async def embed_handler(
     ollama: OllamaClient, args: Dict[str, Any], format: ResponseFormat
 ) -> str:
-    """Generate embeddings for text"""
+    """
+    Generate vector embeddings for text using Ollama embedding models.
+
+    Args:
+        ollama: Ollama client instance
+        args: Arguments containing model and input text
+        format: Response format (JSON or Markdown)
+
+    Returns:
+        Formatted embeddings response
+
+    Raises:
+        ValueError: If required arguments are missing
+        ModelNotFoundError: If the specified model is not found
+    """
     model = args.get("model")
     input_text = args.get("input")
 
     if not model:
+        logger.error("Embed handler called without model name")
         raise ValueError("Model name is required")
     if not input_text:
+        logger.error("Embed handler called without input text")
         raise ValueError("Input text is required")
 
+    logger.debug("Embed handler called with model: %s", model)
+
     try:
+        logger.info("Generating embeddings with model: %s", model)
         result = await ollama.embed(model, input_text)
+        logger.debug("Embeddings generated successfully")
         return format_response(result, format)
+    except ModelNotFoundError:
+        logger.error("Model not found: %s", model)
+        raise
     except Exception as e:
         if "model not found" in str(e).lower():
+            logger.error("Model not found: %s", model)
             raise ModelNotFoundError(model)
+        logger.error("Embed handler error: %s", e, exc_info=True)
         raise
 
 

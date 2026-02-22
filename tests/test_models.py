@@ -2,8 +2,6 @@
 Tests for models.py - Core types and enums
 """
 
-import sys
-import os
 import pytest
 
 # Package is installed, import from mcp_ollama_python
@@ -13,7 +11,9 @@ from mcp_ollama_python.models import (
     MessageRole,
     ChatMessage,
     Tool,
+    ToolFunction,
     ToolCall,
+    ToolCallFunction,
     ToolDefinition,
     ToolContext,
     ToolResult,
@@ -148,21 +148,23 @@ class TestTool:
 
     def test_tool_creation(self):
         """Test tool creation"""
-        tool = Tool(
-            type="function",
-            function={
-                "name": "get_weather",
-                "description": "Get weather information",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "location": {"type": "string"}
-                    }
+        tool_function = ToolFunction(
+            name="get_weather",
+            description="Get weather information",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "location": {"type": "string"}
                 }
             }
         )
+        tool = Tool(
+            type="function",
+            function=tool_function
+        )
         assert tool.type == "function"
-        assert tool.function["name"] == "get_weather"
+        assert tool.function.name == "get_weather"
+        assert tool.function.description == "Get weather information"
 
 
 class TestToolCall:
@@ -170,13 +172,13 @@ class TestToolCall:
 
     def test_tool_call_creation(self):
         """Test tool call creation"""
-        call = ToolCall(
-            function={
-                "name": "get_weather",
-                "arguments": '{"location": "New York"}'
-            }
+        tool_call_function = ToolCallFunction(
+            name="get_weather",
+            arguments='{"location": "New York"}'
         )
-        assert call.function["name"] == "get_weather"
+        call = ToolCall(function=tool_call_function)
+        assert call.function.name == "get_weather"
+        assert call.function.arguments == '{"location": "New York"}'
 
 
 class TestToolDefinition:

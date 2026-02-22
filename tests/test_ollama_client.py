@@ -2,7 +2,6 @@
 Tests for ollama_client.py - Ollama HTTP client wrapper
 """
 
-import sys
 import os
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -305,7 +304,6 @@ class TestOllamaClientModelManagement:
         """Test deleting a model"""
         with patch('httpx.AsyncClient') as mock_client_class:
             mock_response = MagicMock()
-            mock_response.json.return_value = {"status": "success"}
             mock_response.raise_for_status = MagicMock()
             mock_response.headers = {"content-length": "0"}
             mock_response.content = b""
@@ -321,7 +319,8 @@ class TestOllamaClientModelManagement:
             mock_client.request.assert_called_once_with(
                 "DELETE", "/api/delete", json={"name": "old-model"}
             )
-            assert result == {"status": "success"}
+            # Empty response returns empty dict
+            assert result == {}
 
     @pytest.mark.asyncio
     async def test_copy_model(self):

@@ -2,8 +2,6 @@
 Pytest configuration and shared fixtures for mcp-ollama-python tests
 """
 
-import sys
-import os
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 

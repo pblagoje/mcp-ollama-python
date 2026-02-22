@@ -2,20 +2,37 @@
 Ollama execute tool - Direct code execution with AI assistance
 """
 
+import logging
 import subprocess
 import tempfile
 import os
 import sys
-from typing import Dict, Any
+from typing import Dict, Any, List
 from ..models import ToolDefinition, ResponseFormat
 from ..ollama_client import OllamaClient
 from ..response_formatter import format_response
+
+logger = logging.getLogger(__name__)
 
 
 async def execute_handler(
     ollama: OllamaClient, args: Dict[str, Any], format: ResponseFormat
 ) -> str:
-    """Execute code with optional AI generation"""
+    """
+    Execute code directly or generate and execute using AI.
+
+    Args:
+        ollama: Ollama client instance
+        args: Arguments containing code, language, generate flag, prompt, and model
+        format: Response format (JSON or Markdown)
+
+    Returns:
+        Formatted execution results including stdout, stderr, and return code
+
+    Raises:
+        ValueError: If required arguments are missing
+    """
+    logger.debug("Execute handler called")
     code = args.get("code")
     language = args.get("language", "python")
     generate = args.get("generate", False)
@@ -24,10 +41,12 @@ async def execute_handler(
 
     # If generate is True, use AI to generate code first
     if generate and prompt:
+        logger.info("Generating code using AI: model=%s, language=%s", model, language)
         try:
             gen_prompt = f"Write a complete, runnable {language} program that: {prompt}\n\nProvide only the code, no explanations."
             result = await ollama.generate(model, gen_prompt)
             code = result.get("response", "")
+            logger.debug("Code generated successfully")
 
             # Clean up code (remove markdown code blocks if present)
             if "```" in code:
@@ -42,14 +61,18 @@ async def execute_handler(
                         code_lines.append(line)
                 code = "\n".join(code_lines).strip()
         except Exception as e:
+            logger.error("Failed to generate code: %s", e, exc_info=True)
             return format_response(
                 {"error": f"Failed to generate code: {str(e)}"}, format
             )
 
     if not code:
+        logger.error("Execute handler called without code")
         raise ValueError(
             "Code is required (either provided directly or generated via prompt)"
         )
+
+    logger.info("Executing %s code", language)
 
     # Execute the code
     try:
@@ -60,9 +83,12 @@ async def execute_handler(
             f.write(code)
             temp_file = f.name
 
+        logger.debug("Created temporary file: %s", temp_file)
+
         try:
             # Get the command to run
             cmd = _get_execution_command(language, temp_file)
+            logger.debug("Executing command: %s", cmd)
 
             # Execute with timeout
             result = subprocess.run(
@@ -70,7 +96,6 @@ async def execute_handler(
                 capture_output=True,
                 text=True,
                 timeout=30,
-                shell=True if sys.platform == "win32" else False,
             )
 
             output = {
@@ -86,6 +111,7 @@ async def execute_handler(
                 output["generated"] = True
                 output["prompt"] = prompt
 
+            logger.info("Execution completed: returncode=%d", result.returncode)
             return format_response(output, format)
 
         finally:
@@ -96,17 +122,27 @@ async def execute_handler(
                 pass
 
     except subprocess.TimeoutExpired:
+        logger.warning("Execution timed out for %s code", language)
         return format_response(
             {"error": "Execution timed out (30 seconds limit)", "code": code}, format
         )
     except Exception as e:
+        logger.error("Execution failed: %s", e, exc_info=True)
         return format_response(
             {"error": f"Execution failed: {str(e)}", "code": code}, format
         )
 
 
 def _get_file_extension(language: str) -> str:
-    """Get file extension for language"""
+    """
+    Get file extension for programming language.
+
+    Args:
+        language: Programming language name
+
+    Returns:
+        File extension for the language
+    """
     extensions = {
         "python": "py",
         "javascript": "js",
@@ -124,8 +160,20 @@ def _get_file_extension(language: str) -> str:
     return extensions.get(language.lower(), "txt")
 
 
-def _get_execution_command(language: str, file_path: str) -> list:
-    """Get execution command for language"""
+def _get_execution_command(language: str, file_path: str) -> List[str]:
+    """
+    Get execution command for programming language.
+
+    Args:
+        language: Programming language name
+        file_path: Path to the code file
+
+    Returns:
+        Command list to execute the code
+
+    Raises:
+        ValueError: If language is not supported
+    """
     commands = {
         "python": [sys.executable, file_path],
         "javascript": ["node", file_path],

@@ -8,6 +8,7 @@ Package-compatible version — uses ~/.mcp-ollama-python/ for data storage.
 
 import asyncio
 import json
+import logging
 import os
 from pathlib import Path
 import signal
@@ -29,22 +30,57 @@ ENV_VARS_FILE = TMP_DIR / ".mcp_env_vars.json"
 LOG_FILE = LOGS_DIR / "mcp_ollama_server.log"
 ERROR_LOG_FILE = LOGS_DIR / "mcp_ollama_server_error.log"
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
 
-def _ensure_dirs():
-    """Create data directories on first use (not at import time)."""
-    TMP_DIR.mkdir(parents=True, exist_ok=True)
-    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+
+def _ensure_dirs() -> None:
+    """
+    Create data directories on first use (not at import time).
+
+    Raises:
+        OSError: If directory creation fails
+    """
+    logger.debug("Ensuring data directories exist")
+    try:
+        TMP_DIR.mkdir(parents=True, exist_ok=True)
+        LOGS_DIR.mkdir(parents=True, exist_ok=True)
+        # Set restrictive permissions
+        os.chmod(TMP_DIR, 0o700)
+        os.chmod(LOGS_DIR, 0o700)
+        logger.debug("Data directories created successfully")
+    except OSError as e:
+        logger.error("Failed to create data directories: %s", e, exc_info=True)
+        raise
 
 
 def is_mcp_server_process(pid: int) -> bool:
-    """Check if the given PID corresponds to an actual MCP server process"""
+    """
+    Check if the given PID corresponds to an actual MCP server process.
+
+    Args:
+        pid: Process ID to check
+
+    Returns:
+        True if the PID is a valid MCP server process, False otherwise
+    """
+    if not isinstance(pid, int) or pid <= 0:
+        logger.warning("Invalid PID: %s", pid)
+        return False
+
+    logger.debug("Checking if PID %d is MCP server process", pid)
     try:
         process = psutil.Process(pid)
         if not process.is_running():
+            logger.debug("PID %d is not running", pid)
             return False
 
         cmdline = process.cmdline()
         if not cmdline:
+            logger.debug("PID %d has no command line", pid)
             return False
 
         cmdline_str = " ".join(cmdline).lower()
@@ -54,13 +90,28 @@ def is_mcp_server_process(pid: int) -> bool:
         )
         is_poetry_wrapper = "poetry" in cmdline_str and is_mcp
 
-        return (is_python and is_mcp) or is_poetry_wrapper
-    except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+        result = (is_python and is_mcp) or is_poetry_wrapper
+        logger.debug("PID %d is MCP server: %s", pid, result)
+        return result
+    except psutil.NoSuchProcess:
+        logger.debug("PID %d does not exist", pid)
+        return False
+    except psutil.AccessDenied:
+        logger.warning("Access denied when checking PID %d", pid)
+        return False
+    except psutil.ZombieProcess:
+        logger.debug("PID %d is a zombie process", pid)
         return False
 
 
-def cleanup_stale_pipe_files(current_pid: Optional[int] = None):
-    """Remove all pipe files that don't correspond to the running MCP server"""
+def cleanup_stale_pipe_files(current_pid: Optional[int] = None) -> None:
+    """
+    Remove all pipe files that don't correspond to the running MCP server.
+
+    Args:
+        current_pid: PID of the currently running server (if any)
+    """
+    logger.debug("Cleaning up stale pipe files (current_pid=%s)", current_pid)
     try:
         for pipe_file in TMP_DIR.glob(".mcp_ollama_server_*.pipe"):
             try:
@@ -73,64 +124,140 @@ def cleanup_stale_pipe_files(current_pid: Optional[int] = None):
                 if file_pid != current_pid or not is_mcp_server_process(file_pid):
                     try:
                         pipe_file.unlink()
-                    except OSError:
-                        pass
-            except (ValueError, OSError):
+                        logger.info("Cleaned up stale pipe file: %s", pipe_file.name)
+                    except OSError as e:
+                        logger.warning("Could not remove %s: %s", pipe_file.name, e)
+            except ValueError as e:
+                logger.debug("Invalid PID in pipe filename %s: %s", pipe_file.name, e)
                 try:
                     pipe_file.unlink()
-                except OSError:
-                    pass
-    except OSError:
-        pass
+                    logger.info("Cleaned up invalid pipe file: %s", pipe_file.name)
+                except OSError as e:
+                    logger.warning(
+                        "Could not remove invalid pipe file %s: %s", pipe_file.name, e
+                    )
+            except OSError as e:
+                logger.warning("Error processing pipe file %s: %s", pipe_file.name, e)
+    except OSError as e:
+        logger.error("Error during pipe cleanup: %s", e, exc_info=True)
 
 
 class MCPInteractive:
-    """Interactive MCP Server Manager"""
+    """
+    Interactive MCP Server Manager.
 
-    def __init__(self):
-        self.env_vars = self.load_env_vars()
-        self.server = None
-        self.ollama_client = None
+    Provides a menu-driven interface to manage and interact with the Ollama MCP Server,
+    including server lifecycle management, environment variable configuration, and
+    command execution.
+    """
+
+    def __init__(self) -> None:
+        """
+        Initialize MCP Interactive manager.
+
+        Loads saved environment variables and initializes server state.
+        """
+        logger.debug("Initializing MCPInteractive")
+        self.env_vars: Dict[str, str] = self.load_env_vars()
+        self.server: Optional[OllamaMCPServer] = None
+        self.ollama_client: Optional[OllamaClient] = None
+        logger.info(
+            "MCPInteractive initialized with %d environment variables",
+            len(self.env_vars),
+        )
 
     def load_env_vars(self) -> Dict[str, str]:
-        """Load saved environment variables"""
+        """
+        Load saved environment variables from file.
+
+        Returns:
+            Dictionary of environment variables, empty dict if file doesn't exist or is invalid
+        """
+        logger.debug("Loading environment variables from %s", ENV_VARS_FILE)
         if ENV_VARS_FILE.exists():
             try:
-                return json.loads(ENV_VARS_FILE.read_text())
-            except (json.JSONDecodeError, OSError):
+                env_vars = json.loads(ENV_VARS_FILE.read_text())
+                logger.info("Loaded %d environment variables", len(env_vars))
+                return env_vars
+            except json.JSONDecodeError as e:
+                logger.warning("Invalid JSON in env vars file: %s", e)
                 return {}
+            except OSError as e:
+                logger.error("Failed to read env vars file: %s", e)
+                return {}
+        logger.debug("No env vars file found")
         return {}
 
-    def save_env_vars(self):
-        """Save environment variables to file"""
-        ENV_VARS_FILE.write_text(json.dumps(self.env_vars, indent=2))
+    def save_env_vars(self) -> None:
+        """
+        Save environment variables to file.
 
-    def apply_env_vars(self):
-        """Apply stored environment variables to current process"""
+        Raises:
+            OSError: If file write fails
+        """
+        logger.debug(
+            "Saving %d environment variables to %s", len(self.env_vars), ENV_VARS_FILE
+        )
+        try:
+            ENV_VARS_FILE.write_text(json.dumps(self.env_vars, indent=2))
+            # Set restrictive permissions
+            os.chmod(ENV_VARS_FILE, 0o600)
+            logger.info("Environment variables saved successfully")
+        except OSError as e:
+            logger.error("Failed to save environment variables: %s", e, exc_info=True)
+            raise
+
+    def apply_env_vars(self) -> None:
+        """
+        Apply stored environment variables to current process.
+
+        Sets all stored environment variables in os.environ.
+        """
+        logger.debug("Applying %d environment variables", len(self.env_vars))
         for key, value in self.env_vars.items():
             os.environ[key] = value
+            logger.debug("Set %s=%s", key, value)
+        logger.info("Environment variables applied")
 
     def get_server_pid(self) -> Optional[int]:
-        """Get the PID of the running server if it exists and is valid"""
+        """
+        Get the PID of the running server if it exists and is valid.
+
+        Returns:
+            The PID of the running server, or None if not running
+        """
+        logger.debug("Getting server PID from %s", PID_FILE)
         if PID_FILE.exists():
             try:
                 pid = int(PID_FILE.read_text().strip())
+                logger.debug("Found PID %d in PID file", pid)
 
                 if is_mcp_server_process(pid):
                     cleanup_stale_pipe_files(current_pid=pid)
+                    logger.debug("Server is running with PID %d", pid)
                     return pid
                 else:
+                    logger.info("Found stale PID file, cleaning up")
                     PID_FILE.unlink()
                     cleanup_stale_pipe_files()
                     return None
-            except (ValueError, FileNotFoundError):
+            except ValueError as e:
+                logger.warning("Invalid PID in file: %s", e)
+                return None
+            except FileNotFoundError:
+                logger.debug("PID file disappeared during read")
                 return None
 
         cleanup_stale_pipe_files()
         return None
 
-    def check_server_status(self):
-        """Check and display server status"""
+    def check_server_status(self) -> None:
+        """
+        Check and display server status.
+
+        Displays server PID, process information, and Ollama connection status.
+        """
+        logger.debug("Checking server status")
         print("\n" + "=" * 60)
         print("SERVER STATUS")
         print("=" * 60)
@@ -191,8 +318,14 @@ class MCPInteractive:
         print("=" * 60)
         input("\nPress Enter to continue...")
 
-    def start_server(self):
-        """Start the MCP server"""
+    def start_server(self) -> None:
+        """
+        Start the MCP server.
+
+        Creates necessary directories, applies environment variables, and starts
+        the server process with proper logging and error handling.
+        """
+        logger.info("Starting MCP server")
         print("\n" + "=" * 60)
         print("START SERVER")
         print("=" * 60)
@@ -290,8 +423,14 @@ class MCPInteractive:
 
         input("\nPress Enter to continue...")
 
-    def stop_server(self):
-        """Stop the running server"""
+    def stop_server(self) -> None:
+        """
+        Stop the running server.
+
+        Sends SIGTERM to the server process, waits for graceful shutdown,
+        and forces termination if necessary.
+        """
+        logger.info("Stopping MCP server")
         print("\n" + "=" * 60)
         print("STOP SERVER")
         print("=" * 60)
@@ -356,8 +495,14 @@ class MCPInteractive:
 
         input("\nPress Enter to continue...")
 
-    def list_commands(self):
-        """List available MCP commands"""
+    def list_commands(self) -> None:
+        """
+        List available MCP commands.
+
+        Discovers and displays all available MCP tools with their descriptions
+        and argument specifications.
+        """
+        logger.debug("Listing available commands")
         print("\n" + "=" * 60)
         print("AVAILABLE MCP COMMANDS")
         print("=" * 60)
@@ -402,8 +547,14 @@ class MCPInteractive:
 
         input("\nPress Enter to continue...")
 
-    def manage_env_vars(self):
-        """Manage environment variables"""
+    def manage_env_vars(self) -> None:
+        """
+        Manage environment variables.
+
+        Provides a submenu for viewing, adding, removing, and resetting
+        environment variables.
+        """
+        logger.debug("Managing environment variables")
         while True:
             print("\n" + "=" * 60)
             print("ENVIRONMENT VARIABLES MANAGEMENT")
@@ -430,8 +581,13 @@ class MCPInteractive:
             else:
                 print("Invalid option. Please try again.")
 
-    def view_env_vars(self):
-        """View current environment variables"""
+    def view_env_vars(self) -> None:
+        """
+        View current environment variables.
+
+        Displays both custom and system Ollama-related environment variables.
+        """
+        logger.debug("Viewing environment variables")
         print("\n" + "-" * 60)
         print("CURRENT ENVIRONMENT VARIABLES")
         print("-" * 60)
@@ -460,8 +616,13 @@ class MCPInteractive:
 
         input("\nPress Enter to continue...")
 
-    def add_env_var(self):
-        """Add or update an environment variable"""
+    def add_env_var(self) -> None:
+        """
+        Add or update an environment variable.
+
+        Prompts user for variable name and value, then saves to configuration.
+        """
+        logger.debug("Adding/updating environment variable")
         print("\n" + "-" * 60)
         print("ADD/UPDATE ENVIRONMENT VARIABLE")
         print("-" * 60)
@@ -496,8 +657,13 @@ class MCPInteractive:
 
         input("\nPress Enter to continue...")
 
-    def remove_env_var(self):
-        """Remove an environment variable"""
+    def remove_env_var(self) -> None:
+        """
+        Remove an environment variable.
+
+        Prompts user to select a variable to remove from configuration.
+        """
+        logger.debug("Removing environment variable")
         print("\n" + "-" * 60)
         print("REMOVE ENVIRONMENT VARIABLE")
         print("-" * 60)
@@ -539,8 +705,13 @@ class MCPInteractive:
 
         input("\nPress Enter to continue...")
 
-    def reset_env_vars(self):
-        """Reset environment variables to defaults"""
+    def reset_env_vars(self) -> None:
+        """
+        Reset environment variables to defaults.
+
+        Clears all custom environment variables after user confirmation.
+        """
+        logger.debug("Resetting environment variables")
         print("\n" + "-" * 60)
         print("RESET ENVIRONMENT VARIABLES")
         print("-" * 60)
@@ -560,8 +731,14 @@ class MCPInteractive:
 
         input("\nPress Enter to continue...")
 
-    def run_mcp_command(self):
-        """Run an MCP command interactively"""
+    def run_mcp_command(self) -> None:
+        """
+        Run an MCP command interactively.
+
+        Initializes the MCP server, displays available commands, prompts for
+        arguments, and executes the selected command.
+        """
+        logger.debug("Running MCP command interactively")
         print("\n" + "=" * 60)
         print("RUN MCP COMMAND")
         print("=" * 60)
@@ -709,8 +886,13 @@ class MCPInteractive:
 
         input("\nPress Enter to continue...")
 
-    def view_logs(self):
-        """View server logs"""
+    def view_logs(self) -> None:
+        """
+        View server logs.
+
+        Displays contents of both standard log and error log files.
+        """
+        logger.debug("Viewing server logs")
         print("\n" + "=" * 60)
         print("SERVER LOGS")
         print("=" * 60)
@@ -759,8 +941,12 @@ class MCPInteractive:
 
         input("\nPress Enter to continue...")
 
-    def show_menu(self):
-        """Display main menu"""
+    def show_menu(self) -> None:
+        """
+        Display main menu.
+
+        Shows all available menu options for the interactive manager.
+        """
         print("\n" + "=" * 60)
         print("OLLAMA MCP SERVER - INTERACTIVE MANAGER")
         print("=" * 60)
@@ -775,8 +961,13 @@ class MCPInteractive:
         print("9. Exit")
         print("\n" + "=" * 60)
 
-    def run(self):
-        """Main loop"""
+    def run(self) -> None:
+        """
+        Main loop.
+
+        Displays menu and processes user input until exit is selected.
+        """
+        logger.info("Starting interactive manager main loop")
         while True:
             self.show_menu()
             choice = input("\nSelect option (1-9): ").strip()
@@ -805,8 +996,17 @@ class MCPInteractive:
                 input("\nPress Enter to continue...")
 
 
-def main():
-    """Main entry point"""
+def main() -> None:
+    """
+    Main entry point.
+
+    Initializes directories, creates MCPInteractive instance, and starts
+    the interactive manager. Handles keyboard interrupts and errors gracefully.
+
+    Raises:
+        SystemExit: On fatal errors or user interrupt
+    """
+    logger.info("Starting MCP Interactive Manager")
     _ensure_dirs()
     try:
         manager = MCPInteractive()

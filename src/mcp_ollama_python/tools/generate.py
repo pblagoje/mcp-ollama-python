@@ -2,7 +2,8 @@
 Ollama generate text tool
 """
 
-from typing import Dict, Any
+import logging
+from typing import Dict, Any, Optional
 from ..models import (
     ToolDefinition,
     ResponseFormat,
@@ -12,27 +13,64 @@ from ..models import (
 from ..ollama_client import OllamaClient
 from ..response_formatter import format_response
 
+logger = logging.getLogger(__name__)
+
 
 async def generate_handler(
     ollama: OllamaClient, args: Dict[str, Any], format: ResponseFormat
 ) -> str:
-    """Generate text completions"""
+    """
+    Generate text completions using Ollama models.
+
+    Args:
+        ollama: Ollama client instance
+        args: Arguments containing model, prompt, and options
+        format: Response format (JSON or Markdown)
+
+    Returns:
+        Formatted generation response as string
+
+    Raises:
+        ValueError: If required arguments are missing
+        ModelNotFoundError: If the specified model is not found
+    """
     model = args.get("model")
     prompt = args.get("prompt")
     options = args.get("options")
 
     if not model:
+        logger.error("Generate handler called without model name")
         raise ValueError("Model name is required")
     if not prompt:
+        logger.error("Generate handler called without prompt")
         raise ValueError("Prompt is required")
 
+    logger.debug("Generate handler called with model: %s", model)
+
     try:
-        gen_options = GenerationOptions(**options) if options else None
+        gen_options: Optional[GenerationOptions] = None
+        if options:
+            try:
+                gen_options = GenerationOptions(**options)
+                logger.debug("Using generation options: %s", options)
+            except Exception as e:
+                logger.error("Failed to parse options: %s", e)
+                raise ValueError(f"Invalid options: {e}")
+
+        logger.info("Starting generation with model: %s", model)
         result = await ollama.generate(model, prompt, gen_options)
+        logger.debug("Generation completed successfully")
         return format_response(result, format)
+    except ModelNotFoundError:
+        logger.error("Model not found: %s", model)
+        raise
+    except ValueError:
+        raise
     except Exception as e:
         if "model not found" in str(e).lower():
+            logger.error("Model not found: %s", model)
             raise ModelNotFoundError(model)
+        logger.error("Generate handler error: %s", e, exc_info=True)
         raise
 
 

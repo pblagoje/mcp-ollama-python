@@ -1,8 +1,6 @@
 """Tests for autoloader.py - Tool autoloader for dynamic tool discovery
 """
 
-import sys
-import os
 import pytest
 
 # Package is installed, import from mcp_ollama_python
@@ -80,20 +78,20 @@ class TestAutoloaderIntegration:
         """Test discovery against the real tools directory if it exists"""
         try:
             from mcp_ollama_python.autoloader import discover_tools
-            
+
             # This will test against the actual tools directory
             result = await discover_tools()
-            
+
             # Should return a list (may be empty if no tools defined)
             assert isinstance(result, list)
-            
+
             # All items should be ToolDefinition instances
             for tool in result:
                 assert isinstance(tool, ToolDefinition)
                 assert hasattr(tool, 'name')
                 assert hasattr(tool, 'description')
                 assert hasattr(tool, 'input_schema')
-                
+
         except Exception as e:
             # If tools package doesn't exist or has issues, that's okay for this test
             pytest.skip(f"Skipping integration test: {e}")

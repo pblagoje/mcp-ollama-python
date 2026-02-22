@@ -2,8 +2,6 @@
 Tests for server.py - MCP Server implementation for Ollama
 """
 
-import sys
-import os
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 import json
