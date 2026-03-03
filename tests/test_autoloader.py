@@ -3,7 +3,6 @@
 
 import pytest
 
-# Package is installed, import from mcp_ollama_python
 from mcp_ollama_python.models import ToolDefinition
 
 

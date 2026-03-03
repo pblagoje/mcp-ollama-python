@@ -1,6 +1,6 @@
 # 🦙 Ollama MCP Server (Python)
 
-**Supercharge your AI assistant with local LLM access**
+**Supercharge your AI assistant with local LLM access, run powerful AI models right on your own computer, no internet required.**
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue)](https://python.org)
 [![Poetry](https://img.shields.io/badge/Poetry-1.0+-blue)](https://python-poetry.org)

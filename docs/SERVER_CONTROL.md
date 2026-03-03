@@ -205,16 +205,12 @@ sudo systemctl start mcp-ollama.service
 sudo systemctl status mcp-ollama.service
 ```
 
-**Windows (NSSM):**
+**Windows Service:**
 
-```cmd
-# Install NSSM (Non-Sucking Service Manager)
-# Download from https://nssm.cc/
-
-# Install service
-nssm install OllamaMCP "C:\Python\python.exe" "-m mcp_ollama_python"
-nssm set OllamaMCP AppDirectory "C:\myCode\gitHub\mcp-ollama-python"
-nssm start OllamaMCP
+For Windows service installation, please use the separate `d4-ollama-win-service` project:
+```bash
+# See: https://github.com/pblagoje/d4-ollama-win-service
+# This project provides scripts for running Ollama as a Windows service using NSSM
 ```
 
 ### Custom Ollama Host

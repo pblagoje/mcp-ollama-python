@@ -2,13 +2,13 @@
 Tests for server.py - MCP Server implementation for Ollama
 """
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 import json
+from unittest.mock import AsyncMock, MagicMock, patch
 
-# Package is installed, import from mcp_ollama_python
-from mcp_ollama_python.models import ResponseFormat, ToolDefinition
+import pytest
+
 from mcp_ollama_python.autoloader import ToolRegistry
+from mcp_ollama_python.models import ResponseFormat, ToolDefinition
 
 
 def _make_registry(tools_and_handlers):

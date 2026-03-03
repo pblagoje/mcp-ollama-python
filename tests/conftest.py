@@ -2,8 +2,9 @@
 Pytest configuration and shared fixtures for mcp-ollama-python tests
 """
 
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 
 # Package is installed, no path manipulation needed
 

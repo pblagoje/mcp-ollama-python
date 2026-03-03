@@ -8,11 +8,11 @@ Package-compatible version — uses ~/.mcp-ollama-python/ for data storage.
 
 import logging
 import os
+from pathlib import Path
 import signal
 import subprocess
 import sys
 import time
-from pathlib import Path
 from typing import Optional
 
 import psutil

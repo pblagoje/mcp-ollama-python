@@ -6,7 +6,7 @@ import importlib
 import logging
 import os
 import pkgutil
-from typing import List, Callable, Any, Dict, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 try:
     from mcp_ollama_python.ollama_client import OllamaClient

@@ -4,24 +4,22 @@ Tests for models.py - Core types and enums
 
 import pytest
 
-# Package is installed, import from mcp_ollama_python
 from mcp_ollama_python.models import (
-    ResponseFormat,
+    ChatMessage,
     GenerationOptions,
     MessageRole,
-    ChatMessage,
+    ModelNotFoundError,
+    NetworkError,
+    OllamaError,
+    ResponseFormat,
     Tool,
-    ToolFunction,
     ToolCall,
     ToolCallFunction,
     ToolDefinition,
-    ToolContext,
+    ToolFunction,
     ToolResult,
-    OllamaError,
-    ModelNotFoundError,
-    NetworkError,
+    WebFetchResult,
     WebSearchResult,
-    WebFetchResult
 )
 
 
@@ -155,17 +153,20 @@ class TestTool:
                 "type": "object",
                 "properties": {
                     "location": {"type": "string"}
-                }
+                },
+                "required": ["location"]
             }
         )
+
         tool = Tool(
             type="function",
             function=tool_function
         )
+
         assert tool.type == "function"
         assert tool.function.name == "get_weather"
         assert tool.function.description == "Get weather information"
-
+        assert tool.function.parameters["properties"]["location"]["type"] == "string"
 
 class TestToolCall:
     """Tests for ToolCall model"""
@@ -261,7 +262,7 @@ class TestWebSearchResult:
             content="Page content here"
         )
         assert result.title == "Test Page"
-        assert result.url == "https://example.com"
+        assert str(result.url) == "https://example.com/"
         assert result.content == "Page content here"
 
 

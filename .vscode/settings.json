@@ -1,5 +1,4 @@
 {
-  "python.defaultInterpreterPath": ".venv/Scripts/python.exe",
   "python.terminal.activateEnvironment": true,
   "python.terminal.activateEnvInCurrentTerminal": true,
   "python.venvPath": ".venv",
@@ -7,5 +6,7 @@
   "terminal.integrated.env.windows": {
     "VIRTUAL_ENV": ".venv",
     "PATH": ".venv/Scripts;${env:PATH}"
-  }
+  },
+  "python.defaultInterpreterPath": ".venv/Scripts/python.exe",
+  "isort.interpreter": [".venv/Scripts/python.exe"]
 }

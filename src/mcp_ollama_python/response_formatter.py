@@ -4,7 +4,7 @@ Response formatting utilities
 
 import json
 import logging
-from typing import Any, Dict, List, Set, Optional
+from typing import Any, Dict, List, Optional, Set
 
 try:
     from mcp_ollama_python.models import ResponseFormat

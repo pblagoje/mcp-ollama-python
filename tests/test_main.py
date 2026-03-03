@@ -2,8 +2,9 @@
 python -m pytest tests/ -v
 """
 
-import sys
 import os
+import sys
+
 import pytest
 
 # Package is installed, import from mcp_ollama_python
@@ -19,7 +20,7 @@ class TestMainModuleStructure:
             # Check main function exists
             assert hasattr(main, 'main')
             assert callable(main.main)
-            
+
             # Check run function exists
             assert hasattr(main, 'run')
             assert callable(main.run)

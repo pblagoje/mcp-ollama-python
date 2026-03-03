@@ -3,17 +3,16 @@ Tests for response_formatter.py - Response formatting utilities
 """
 
 import json
+
 import pytest
 
-# Package is installed, import from mcp_ollama_python
+from mcp_ollama_python.models import ResponseFormat
 from mcp_ollama_python.response_formatter import (
+    _format_object_entry,
+    array_to_markdown_table,
     format_response,
     json_to_markdown,
-    array_to_markdown_table,
-    _format_object_entry,
-    escape_markdown
 )
-from mcp_ollama_python.models import ResponseFormat
 
 
 class TestFormatResponse:

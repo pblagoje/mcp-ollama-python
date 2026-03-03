@@ -2,10 +2,10 @@
 MCP Server implementation for Ollama
 """
 
+from dataclasses import dataclass
 import json
 import logging
-from typing import Any, Dict, Optional, List
-from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 try:
     from mcp_ollama_python.ollama_client import OllamaClient

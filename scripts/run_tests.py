@@ -21,14 +21,14 @@ def main():
     project_root = Path(__file__).parent.parent
     tests_dir = project_root / "tests"
     src_dir = project_root / "src"
-    
+
     # Add src to PYTHONPATH for imports
     env = os.environ.copy()
     python_path = str(src_dir)
     if "PYTHONPATH" in env:
         python_path = f"{python_path}{os.pathsep}{env['PYTHONPATH']}"
     env["PYTHONPATH"] = python_path
-    
+
     # Build pytest command
     pytest_args = [
         sys.executable, "-m", "pytest",
@@ -37,7 +37,7 @@ def main():
         "--tb=short",  # Short traceback format
         "-x",  # Stop on first failure (remove for full run)
     ]
-    
+
     # Add any additional arguments passed to this script
     if len(sys.argv) > 1:
         # Remove -x if user wants full run
@@ -45,41 +45,46 @@ def main():
             pytest_args.remove("-x")
             sys.argv.remove("--full")
         pytest_args.extend(sys.argv[1:])
-    
+
     # Check if pytest is installed
     try:
         import pytest
-        print(f"Using pytest version: {pytest.__version__}")
     except ImportError:
-        print("pytest not found. Installing...")
-        subprocess.run([sys.executable, "-m", "pip", "install", "pytest", "pytest-asyncio"])
-    
+        print("Error: pytest is not installed. Please install it with: pip install pytest pytest-asyncio")
+        return 1
+
     # Check if pytest-asyncio is installed (needed for async tests)
     try:
         import pytest_asyncio
-        print(f"Using pytest-asyncio version: {pytest_asyncio.__version__}")
     except ImportError:
-        print("pytest-asyncio not found. Installing...")
-        subprocess.run([sys.executable, "-m", "pip", "install", "pytest-asyncio"])
-    
+        print("Error: pytest-asyncio is not installed. Please install it with: pip install pytest-asyncio")
+        return 1
+
+    print(f"Using pytest version: {pytest.__version__}")
+    print(f"Using pytest-asyncio version: {pytest_asyncio.__version__}")
     print(f"\n{'='*60}")
-    print("Running mcp-ollama-python tests")
-    print(f"{'='*60}")
     print(f"Tests directory: {tests_dir}")
     print(f"Source directory: {src_dir}")
     print(f"PYTHONPATH: {env['PYTHONPATH']}")
     print(f"{'='*60}\n")
-    
+
     # Run pytest
-    result = subprocess.run(pytest_args, env=env, cwd=str(project_root))
-    
+    try:
+        result = subprocess.run(pytest_args, env=env, cwd=str(project_root), check=False)
+    except FileNotFoundError:
+        print(f"Error: Could not find pytest executable at {sys.executable}")
+        return 1
+    except subprocess.SubprocessError as e:
+        print(f"Error running pytest: {e}")
+        return 1
+
     print(f"\n{'='*60}")
     if result.returncode == 0:
         print("✓ All tests passed!")
     else:
         print(f"✗ Tests failed with exit code: {result.returncode}")
     print(f"{'='*60}")
-    
+
     return result.returncode
 
 

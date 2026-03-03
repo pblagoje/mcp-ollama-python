@@ -5,10 +5,9 @@ Tests for ollama_client.py - Ollama HTTP client wrapper
 import os
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-import json
+import httpx
 
-# Package is installed, import from mcp_ollama_python
-from mcp_ollama_python.models import GenerationOptions, ChatMessage, MessageRole, Tool
+from mcp_ollama_python.models import ChatMessage, GenerationOptions, MessageRole, NetworkError
 
 
 class TestOllamaClientInit:
@@ -95,8 +94,6 @@ class TestOllamaClientPost:
     @pytest.mark.asyncio
     async def test_post_http_error(self):
         """Test POST request with HTTP error"""
-        import httpx
-
         with patch('httpx.AsyncClient') as mock_client_class:
             mock_response = MagicMock()
             mock_response.status_code = 500
@@ -122,13 +119,13 @@ class TestOllamaClientPost:
         """Test POST request with connection error"""
         with patch('httpx.AsyncClient') as mock_client_class:
             mock_client = AsyncMock()
-            mock_client.post = AsyncMock(side_effect=Exception("Connection refused"))
+            mock_client.post = AsyncMock(side_effect=httpx.RequestError("Connection refused"))
             mock_client_class.return_value = mock_client
 
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient()
 
-            with pytest.raises(Exception) as exc_info:
+            with pytest.raises(NetworkError) as exc_info:
                 await client._post("/api/test", {})
 
             assert "Failed to connect to Ollama" in str(exc_info.value)

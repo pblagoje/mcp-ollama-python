@@ -17,9 +17,10 @@ import sys
 import time
 from typing import Dict, Optional
 
+import psutil
+
 from mcp_ollama_python.ollama_client import OllamaClient
 from mcp_ollama_python.server import OllamaMCPServer
-import psutil
 
 # Data directory in user home
 DATA_DIR = Path.home() / ".mcp-ollama-python"
