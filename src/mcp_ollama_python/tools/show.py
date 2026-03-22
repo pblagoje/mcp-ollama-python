@@ -1,5 +1,9 @@
 """
-Ollama show model tool
+Ollama show model tool.
+
+This module provides a handler and tool definition for retrieving detailed information
+about a specified Ollama model. The handler, `show_model_handler`, fetches model
+metadata and formats the response according to the requested format (JSON or Markdown).
 """
 
 import logging
