@@ -11,9 +11,11 @@ from typing import Any, Callable, Dict, List, Optional
 try:
     from mcp_ollama_python.ollama_client import OllamaClient
     from mcp_ollama_python.models import ToolDefinition, ResponseFormat
+    from mcp_ollama_python.security import is_execute_enabled
 except ImportError:
     from .ollama_client import OllamaClient
     from .models import ToolDefinition, ResponseFormat
+    from .security import is_execute_enabled
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -128,6 +130,12 @@ async def discover_tools_with_handlers() -> ToolRegistry:
     for _, module_name, _ in pkgutil.iter_modules([tools_dir]):
         if module_name.startswith("__"):
             logger.debug("Skipping module: %s", module_name)
+            continue
+
+        if module_name == "execute" and not is_execute_enabled():
+            logger.info(
+                "Skipping ollama_execute (set OLLAMA_EXECUTE_ENABLED=1 to enable)"
+            )
             continue
 
         try:

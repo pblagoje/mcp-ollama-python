@@ -5,6 +5,7 @@ Ollama embed tool
 import logging
 from typing import Dict, Any
 from ..models import ToolDefinition, ResponseFormat, ModelNotFoundError
+from ..security import MAX_EMBED_INPUTS, MAX_EMBED_TEXT_LEN, validate_model_name
 from ..ollama_client import OllamaClient
 from ..response_formatter import format_response
 
@@ -38,6 +39,22 @@ async def embed_handler(
     if not input_text:
         logger.error("Embed handler called without input text")
         raise ValueError("Input text is required")
+
+    validate_model_name(model)
+    if isinstance(input_text, str):
+        if len(input_text) > MAX_EMBED_TEXT_LEN:
+            raise ValueError(
+                f"Input text exceeds maximum length of {MAX_EMBED_TEXT_LEN} characters"
+            )
+    elif isinstance(input_text, list):
+        if len(input_text) > MAX_EMBED_INPUTS:
+            raise ValueError(f"Input list exceeds maximum of {MAX_EMBED_INPUTS} items")
+        for i, text in enumerate(input_text):
+            if isinstance(text, str) and len(text) > MAX_EMBED_TEXT_LEN:
+                raise ValueError(
+                    f"Input text at index {i} exceeds maximum length "
+                    f"of {MAX_EMBED_TEXT_LEN} characters"
+                )
 
     logger.debug("Embed handler called with model: %s", model)
 

@@ -39,6 +39,7 @@ Type in your MCP-compatible chat window:
 ## Next Steps
 
 - [Installation Guide](installation.md) — Get up and running in minutes
-- [Available Tools](tools.md) — See all 8 MCP tools
+- [Available Tools](tools.md) — See all MCP tools
+- [Security](SECURITY.md) — Threat model and opt-in code execution
 - [Windsurf Integration](windsurf.md) — Set up with Windsurf IDE
 - [VS Code Integration](vscode.md) — Set up with VS Code

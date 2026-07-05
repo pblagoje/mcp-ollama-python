@@ -51,6 +51,7 @@ nav:
   - Getting Started:
       - Installation: installation.md
       - Configuration: configuration.md
+      - Security: SECURITY.md
   - Tools: tools.md
   - Integrations:
       - Windsurf: windsurf.md

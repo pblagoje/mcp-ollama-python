@@ -73,7 +73,7 @@ Available tools exposed by the local `mcp-ollama-python` server:
 - **ollama_delete** – Delete a local model
 - **ollama_ps** – List running models
 - **ollama_embed** – Create embeddings for input text
-- **ollama_execute** – Execute a system command via the server (utility/test)
+- **ollama_execute** – Optional local code execution (disabled unless `OLLAMA_EXECUTE_ENABLED=1`; see [Security](SECURITY.md))
 
 ## How to list tools in Windsurf
 1) Open the command palette and run: `MCP: List Tools`

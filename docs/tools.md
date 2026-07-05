@@ -20,6 +20,14 @@ The Ollama MCP server exposes 8 comprehensive tools for interacting with your lo
 | `ollama_chat` | Interactive chat with models (supports tools/functions) |
 | `ollama_embed` | Generate embeddings for text |
 
+## Optional: Code execution (disabled by default)
+
+| Tool | Description |
+|------|-------------|
+| `ollama_execute` | Run Python/JS/TS/Ruby/PHP/Go locally — requires `OLLAMA_EXECUTE_ENABLED=1` |
+
+See [Security](SECURITY.md) before enabling `ollama_execute`.
+
 ## Web Tools (Ollama Cloud — Planned)
 
 | Tool | Description |

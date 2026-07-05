@@ -22,23 +22,24 @@ class TestOllamaClientInit:
                 assert client.host == "http://127.0.0.1:11434"
                 assert client.api_key is None
 
-    def test_custom_host(self):
-        """Test initialization with custom host"""
+    def test_custom_host(self, monkeypatch):
+        """Test initialization with custom host when remote is allowed"""
+        monkeypatch.setenv("OLLAMA_ALLOW_REMOTE_HOST", "1")
         with patch('httpx.AsyncClient') as mock_client:
             from mcp_ollama_python.ollama_client import OllamaClient
             client = OllamaClient(host="http://custom:8080")
             assert client.host == "http://custom:8080"
 
-    def test_environment_host(self):
+    def test_environment_host(self, monkeypatch):
         """Test initialization reads OLLAMA_HOST from environment"""
-        with patch.dict(os.environ, {"OLLAMA_HOST": "http://env-host:11434"}):
-            with patch('httpx.AsyncClient') as mock_client:
-                # Need to reimport to pick up env var
-                import importlib
-                from mcp_ollama_python import ollama_client
-                importlib.reload(ollama_client)
-                client = ollama_client.OllamaClient()
-                assert client.host == "http://env-host:11434"
+        monkeypatch.setenv("OLLAMA_HOST", "http://127.0.0.1:11434")
+        monkeypatch.delenv("OLLAMA_ALLOW_REMOTE_HOST", raising=False)
+        with patch('httpx.AsyncClient') as mock_client:
+            import importlib
+            from mcp_ollama_python import ollama_client
+            importlib.reload(ollama_client)
+            client = ollama_client.OllamaClient()
+            assert client.host == "http://127.0.0.1:11434"
 
     def test_api_key_in_headers(self):
         """Test API key is added to headers"""

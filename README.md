@@ -81,6 +81,23 @@ Type in your AI assistant's chat:
 | [Server Control](https://pblagoje.github.io/mcp-ollama-python/SERVER_CONTROL/) | Start/stop/manage the server |
 | [Interactive Manager](https://pblagoje.github.io/mcp-ollama-python/mcp_interactive/) | Menu-driven management UI |
 | [Development](https://pblagoje.github.io/mcp-ollama-python/development/) | Contributing, code quality |
+| [Security](https://pblagoje.github.io/mcp-ollama-python/SECURITY/) | Threat model, host validation, opt-in execute |
+
+## Security (v1.0.8)
+
+- **`ollama_execute` is opt-in** — set `OLLAMA_EXECUTE_ENABLED=1`; shell/bash removed
+- **`OLLAMA_HOST` validation** — loopback by default; set `OLLAMA_ALLOW_REMOTE_HOST=1` for LAN/remote Ollama
+- **No HTTP redirects** — reduces SSRF risk toward internal endpoints
+
+Details: [docs/SECURITY.md](docs/SECURITY.md)
+
+## Changelog
+
+### 1.0.8
+
+- Security hardening: host validation, execute tool gating, env allowlist, input limits
+- Fixed `__version__` mismatch with package version
+- Added `tests/test_security.py` and `docs/SECURITY.md`
 
 ## License
 

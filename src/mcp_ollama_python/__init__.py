@@ -9,7 +9,7 @@ import logging
 from .main import run
 
 __all__ = ["run"]
-__version__ = "0.1.0"
+__version__ = "1.0.8"
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

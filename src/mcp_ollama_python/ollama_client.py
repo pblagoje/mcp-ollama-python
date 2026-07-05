@@ -4,9 +4,7 @@ Ollama HTTP client wrapper
 
 import logging
 import os
-import re
 from typing import Any, Dict, List, Optional, Union
-from urllib.parse import urlparse
 
 import httpx
 
@@ -18,8 +16,10 @@ try:
         OllamaError,
         NetworkError,
     )
+    from mcp_ollama_python.security import validate_model_name, validate_ollama_host
 except ImportError:
     from .models import GenerationOptions, ChatMessage, Tool, OllamaError, NetworkError
+    from .security import validate_model_name, validate_ollama_host
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -27,7 +27,6 @@ logger = logging.getLogger(__name__)
 # Constants
 DEFAULT_HOST = "http://127.0.0.1:11434"
 DEFAULT_TIMEOUT = 300.0  # 5 minutes
-MODEL_NAME_PATTERN = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9._:-]*$")
 
 
 class OllamaClient:
@@ -53,7 +52,7 @@ class OllamaClient:
         timeout: float = DEFAULT_TIMEOUT,
     ):
         raw_host = host or os.getenv("OLLAMA_HOST", DEFAULT_HOST)
-        self.host = self._validate_host(raw_host)
+        self.host = validate_ollama_host(raw_host)
         self.api_key = api_key or os.getenv("OLLAMA_API_KEY")
         self.timeout = timeout
 
@@ -72,68 +71,8 @@ class OllamaClient:
             base_url=self.host,
             headers=headers,
             timeout=httpx.Timeout(timeout=self.timeout, connect=10.0),
-            follow_redirects=True,
+            follow_redirects=False,
         )
-
-    @staticmethod
-    def _validate_host(host: str) -> str:
-        """
-        Validate and sanitize the host URL to prevent SSRF attacks.
-
-        Args:
-            host: Host URL to validate
-
-        Returns:
-            Validated host URL
-
-        Raises:
-            ValueError: If host is invalid or potentially insecure
-        """
-        if not host or not isinstance(host, str):
-            raise ValueError("Host must be a non-empty string")
-
-        host = host.strip()
-
-        # Ensure URL has a scheme
-        if not host.startswith(("http://", "https://")):
-            raise ValueError("Host must start with http:// or https://")
-
-        # Parse URL
-        try:
-            parsed = urlparse(host)
-        except Exception as e:
-            raise ValueError(f"Invalid host URL: {e}") from e
-
-        # Validate scheme
-        if parsed.scheme not in ["http", "https"]:
-            raise ValueError("Host must use http or https scheme")
-
-        # Validate hostname exists
-        if not parsed.netloc:
-            raise ValueError("Host must include a valid hostname")
-
-        logger.debug("Host validated: %s", host)
-        return host
-
-    @staticmethod
-    def _validate_model_name(model: str) -> None:
-        """
-        Validate model name format.
-
-        Args:
-            model: Model name to validate
-
-        Raises:
-            ValueError: If model name is invalid
-        """
-        if not model or not isinstance(model, str):
-            raise ValueError("Model name must be a non-empty string")
-
-        if not MODEL_NAME_PATTERN.match(model):
-            raise ValueError(
-                f"Invalid model name '{model}'. Must start with alphanumeric "
-                "and contain only alphanumeric, dots, underscores, hyphens, or colons."
-            )
 
     @staticmethod
     def _validate_non_empty_string(value: str, name: str) -> None:
@@ -322,7 +261,7 @@ class OllamaClient:
             OllamaError: If API returns error
             NetworkError: If connection fails
         """
-        self._validate_model_name(model)
+        validate_model_name(model)
         return await self._post("/api/show", {"name": model})
 
     async def pull(self, model: str) -> Dict[str, Any]:
@@ -340,7 +279,7 @@ class OllamaClient:
             OllamaError: If API returns error
             NetworkError: If connection fails
         """
-        self._validate_model_name(model)
+        validate_model_name(model)
         return await self._post("/api/pull", {"name": model, "stream": False})
 
     async def push(self, model: str) -> Dict[str, Any]:
@@ -358,7 +297,7 @@ class OllamaClient:
             OllamaError: If API returns error
             NetworkError: If connection fails
         """
-        self._validate_model_name(model)
+        validate_model_name(model)
         return await self._post("/api/push", {"name": model, "stream": False})
 
     async def copy(self, source: str, destination: str) -> Dict[str, Any]:
@@ -377,8 +316,8 @@ class OllamaClient:
             OllamaError: If API returns error
             NetworkError: If connection fails
         """
-        self._validate_model_name(source)
-        self._validate_model_name(destination)
+        validate_model_name(source)
+        validate_model_name(destination)
         return await self._post(
             "/api/copy", {"source": source, "destination": destination}
         )
@@ -398,7 +337,7 @@ class OllamaClient:
             OllamaError: If API returns error
             NetworkError: If connection fails
         """
-        self._validate_model_name(model)
+        validate_model_name(model)
         return await self._delete("/api/delete", {"name": model})
 
     async def create(
@@ -420,7 +359,7 @@ class OllamaClient:
             OllamaError: If API returns error
             NetworkError: If connection fails
         """
-        self._validate_model_name(name)
+        validate_model_name(name)
         self._validate_non_empty_string(modelfile, "modelfile")
         data = {"name": name, "modelfile": modelfile}
         if stream:
@@ -451,7 +390,7 @@ class OllamaClient:
             OllamaError: If API returns error
             NetworkError: If connection fails
         """
-        self._validate_model_name(model)
+        validate_model_name(model)
         self._validate_non_empty_string(prompt, "prompt")
         data = {"model": model, "prompt": prompt, "stream": stream}
         if options:
@@ -484,7 +423,7 @@ class OllamaClient:
             OllamaError: If API returns error
             NetworkError: If connection fails
         """
-        self._validate_model_name(model)
+        validate_model_name(model)
         if not messages:
             raise ValueError("messages list cannot be empty")
         data = {
@@ -516,7 +455,7 @@ class OllamaClient:
             OllamaError: If API returns error
             NetworkError: If connection fails
         """
-        self._validate_model_name(model)
+        validate_model_name(model)
         if isinstance(input_text, str):
             self._validate_non_empty_string(input_text, "input_text")
         elif isinstance(input_text, list):

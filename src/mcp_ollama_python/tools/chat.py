@@ -12,6 +12,7 @@ from ..models import (
     GenerationOptions,
     ModelNotFoundError,
 )
+from ..security import MAX_CHAT_MESSAGES, MAX_MESSAGE_CONTENT_LEN, validate_model_name
 from ..ollama_client import OllamaClient
 from ..response_formatter import format_response
 
@@ -53,6 +54,10 @@ async def chat_handler(
     if not isinstance(messages, list) or len(messages) == 0:
         logger.error("Invalid messages format: %s", type(messages))
         raise ValueError("Messages must be a non-empty list")
+    if len(messages) > MAX_CHAT_MESSAGES:
+        raise ValueError(f"Messages exceed maximum of {MAX_CHAT_MESSAGES}")
+
+    validate_model_name(model)
 
     logger.debug(
         "Chat handler called with model: %s, %d messages", model, len(messages)
@@ -63,6 +68,12 @@ async def chat_handler(
         chat_messages: List[ChatMessage] = []
         for i, msg in enumerate(messages):
             try:
+                content = msg.get("content") if isinstance(msg, dict) else None
+                if isinstance(content, str) and len(content) > MAX_MESSAGE_CONTENT_LEN:
+                    raise ValueError(
+                        f"Message at index {i} exceeds maximum content length "
+                        f"of {MAX_MESSAGE_CONTENT_LEN} characters"
+                    )
                 chat_messages.append(ChatMessage(**msg))
             except Exception as e:
                 logger.error("Failed to parse message %d: %s", i, e)

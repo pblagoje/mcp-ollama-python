@@ -21,6 +21,7 @@ import psutil
 
 from mcp_ollama_python.ollama_client import OllamaClient
 from mcp_ollama_python.server import OllamaMCPServer
+from mcp_ollama_python.security import validate_env_var_key, validate_ollama_host
 
 # Data directory in user home
 DATA_DIR = Path.home() / ".mcp-ollama-python"
@@ -177,7 +178,16 @@ class MCPInteractive:
         logger.debug("Loading environment variables from %s", ENV_VARS_FILE)
         if ENV_VARS_FILE.exists():
             try:
-                env_vars = json.loads(ENV_VARS_FILE.read_text())
+                raw = json.loads(ENV_VARS_FILE.read_text())
+                env_vars = {}
+                for key, value in raw.items():
+                    try:
+                        clean_key = validate_env_var_key(key)
+                        if clean_key == "OLLAMA_HOST":
+                            value = validate_ollama_host(str(value))
+                        env_vars[clean_key] = str(value)
+                    except ValueError as exc:
+                        logger.warning("Skipping invalid env var %s: %s", key, exc)
                 logger.info("Loaded %d environment variables", len(env_vars))
                 return env_vars
             except json.JSONDecodeError as e:
@@ -299,8 +309,9 @@ class MCPInteractive:
         try:
             import httpx
 
+            safe_host = validate_ollama_host(ollama_host)
             response = httpx.get(
-                f"{ollama_host}/api/tags", timeout=2.0, follow_redirects=True
+                f"{safe_host}/api/tags", timeout=2.0, follow_redirects=False
             )
             if response.status_code == 200:
                 print("  Status: ✓ Connected")
@@ -315,6 +326,8 @@ class MCPInteractive:
                 print(f"  Status: ✗ Error (HTTP {response.status_code})")
         except httpx.RequestError as e:
             print(f"  Status: ✗ Cannot connect ({str(e)[:50]})")
+        except ValueError as e:
+            print(f"  Status: ✗ Invalid OLLAMA_HOST ({e})")
 
         print("=" * 60)
         input("\nPress Enter to continue...")
@@ -597,8 +610,14 @@ class MCPInteractive:
             print("\nNo custom environment variables set.")
             print("\nCommon variables you might want to set:")
             print("  OLLAMA_HOST - Ollama server URL (default: http://127.0.0.1:11434)")
-            print("  OLLAMA_API_KEY - API key for Ollama (if required)")
+            print("  OLLAMA_API_KEY - API key for Ollama Cloud (if required)")
             print("  OLLAMA_MODELS - Custom models directory")
+            print(
+                "  OLLAMA_EXECUTE_ENABLED - Set to 1 to enable ollama_execute (disabled by default)"
+            )
+            print(
+                "  OLLAMA_ALLOW_REMOTE_HOST - Set to 1 to allow non-local OLLAMA_HOST values"
+            )
         else:
             print()
             for key, value in self.env_vars.items():
@@ -632,6 +651,8 @@ class MCPInteractive:
         print("  OLLAMA_HOST")
         print("  OLLAMA_API_KEY")
         print("  OLLAMA_MODELS")
+        print("  OLLAMA_EXECUTE_ENABLED")
+        print("  OLLAMA_ALLOW_REMOTE_HOST")
 
         key = input("\nEnter variable name (or 'cancel' to go back): ").strip()
 
@@ -643,6 +664,13 @@ class MCPInteractive:
             input("\nPress Enter to continue...")
             return
 
+        try:
+            key = validate_env_var_key(key)
+        except ValueError as exc:
+            print(f"\n✗ {exc}")
+            input("\nPress Enter to continue...")
+            return
+
         current = self.env_vars.get(key, os.environ.get(key, ""))
         if current:
             print(f"\nCurrent value: {current}")
@@ -650,9 +678,14 @@ class MCPInteractive:
         value = input(f"Enter value for {key}: ").strip()
 
         if value:
-            self.env_vars[key] = value
-            self.save_env_vars()
-            print(f"\n✓ Set {key} = {value}")
+            try:
+                if key == "OLLAMA_HOST":
+                    value = validate_ollama_host(value)
+                self.env_vars[key] = value
+                self.save_env_vars()
+                print(f"\n✓ Set {key} = {value}")
+            except ValueError as exc:
+                print(f"\n✗ Invalid value: {exc}")
         else:
             print("\nValue cannot be empty. Variable not updated.")
 
