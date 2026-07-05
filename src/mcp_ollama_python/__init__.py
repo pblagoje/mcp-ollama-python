@@ -5,11 +5,12 @@ This module provides the main entry point and package-level exports.
 """
 
 import logging
+from importlib.metadata import version
 
 from .main import run
 
-__all__ = ["run"]
-__version__ = "1.0.8"
+__all__ = ["run", "__version__"]
+__version__ = version("mcp-ollama-python")
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
