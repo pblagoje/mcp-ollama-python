@@ -2,36 +2,46 @@
 
 **Supercharge your AI assistant with local LLM access**
 
-A Python implementation of the [Model Context Protocol](https://github.com/anthropics/model-context-protocol) (MCP) server that exposes [Ollama](https://ollama.ai) SDK functionality as MCP tools, enabling seamless integration between your local LLM models and MCP-compatible applications like Windsurf and VS Code.
+A Python implementation of the [Model Context Protocol](https://github.com/anthropics/model-context-protocol) (MCP) server that exposes [Ollama](https://ollama.ai) functionality as MCP tools for Windsurf, VS Code, Cursor, Claude Desktop, and other MCP clients.
 
-This is a Python port of the [TypeScript ollama-mcp](https://github.com/rawveg/ollama-mcp) project.
+| Resource | Link |
+|----------|------|
+| GitHub | [pblagoje/mcp-ollama-python](https://github.com/pblagoje/mcp-ollama-python) |
+| PyPI | [mcp-ollama-python](https://pypi.org/project/mcp-ollama-python/) |
+| Companion VS Code extension | [mcp-ollama-extension](https://github.com/pblagoje/mcp-ollama-extension) · [extension docs](https://pblagoje.github.io/mcp-ollama-extension/) · [Marketplace](https://marketplace.visualstudio.com/items?itemName=internetics.mcp-ollama-extension) |
+
+---
+
+## Ecosystem
+
+```
+VS Code extension (optional UI)
+  mcp-ollama-extension
+        │  stdio / MCP
+        ▼
+MCP server (this project)
+  mcp-ollama-python
+        │  HTTP :11434
+        ▼
+Ollama
+```
+
+- **This project** — the MCP server. Required for all clients.
+- **[MCP Ollama Manager](https://github.com/pblagoje/mcp-ollama-extension)** — optional VS Code extension to start/stop the server, browse models, and view logs. See [VS Code Integration](vscode.md).
 
 ---
 
 ## Features
 
-- :cloud: **Ollama Cloud Support** — Full integration with Ollama's cloud platform
-- :wrench: **8 Comprehensive Tools** — Full access to Ollama's SDK functionality
-- :arrows_counterclockwise: **Hot-Swap Architecture** — Automatic tool discovery with zero-config
-- :dart: **Type-Safe** — Built with Pydantic models and type hints
-- :rocket: **Minimal Dependencies** — Lightweight and fast
-- :electric_plug: **Drop-in Integration** — Works with Windsurf, VS Code, and other MCP clients
-- :globe_with_meridians: **Web Search & Fetch** — Real-time web search and content extraction via Ollama Cloud (planned)
-- :twisted_rightwards_arrows: **Hybrid Mode** — Use local and cloud models seamlessly in one server
-
-## Why Python?
-
-This Python implementation provides the same functionality as the TypeScript version but with:
-
-- **Python Native** — No Node.js dependencies required
-- **Poetry Package Management** — Modern Python dependency management
-- **Async/Await** — Native Python async support
-- **Pydantic Models** — Robust data validation and type safety
-- **Poetry Scripts** — Easy installation and execution
+- **8 MCP tools** — chat, generate, embed, list, show, pull, delete, ps
+- **Hot-swap architecture** — automatic tool discovery
+- **Type-safe** — Pydantic models and type hints
+- **Minimal dependencies** — lightweight and fast
+- **Drop-in integration** — Windsurf, VS Code, and other MCP clients
 
 ## Quick Example
 
-Type in your MCP-compatible chat window:
+In an MCP-compatible chat:
 
 - **MCP Tool: ollama / ollama_chat** — Use model llava and tell me a bed time story
 - **MCP Tool: ollama / ollama_chat** — Use model gpt-oss and tell me a bed time story
@@ -42,4 +52,10 @@ Type in your MCP-compatible chat window:
 - [Available Tools](tools.md) — See all MCP tools
 - [Security](SECURITY.md) — Threat model and opt-in code execution
 - [Windsurf Integration](windsurf.md) — Set up with Windsurf IDE
-- [VS Code Integration](vscode.md) — Set up with VS Code
+- [VS Code Integration](vscode.md) — MCP JSON config **or** the companion extension
+- [Companion Extension](companion-extension.md) — How this server relates to the VS Code UI
+
+## Related
+
+- [mcp-ollama-extension](https://github.com/pblagoje/mcp-ollama-extension) — VS Code manager for this server
+- [Ollama](https://ollama.ai/) — Run large language models locally

@@ -1,12 +1,20 @@
 [tool.poetry]
 name = "mcp-ollama-python"
 version = "1.0.8"
-description = "Model Context Protocol server that proxies local Ollama to MCP clients like Windsurf and VS Code"
+description = "Model Context Protocol server that proxies local Ollama to MCP clients like Windsurf and VS Code. Companion VS Code UI: https://github.com/pblagoje/mcp-ollama-extension"
 authors = ["Pedja Blagojevic <pb@internetics.net>"]
 readme = "README.md"
 packages = [{include = "mcp_ollama_python", from = "src"}]
 license = "MIT"
 homepage = "https://github.com/pblagoje/mcp-ollama-python"
+documentation = "https://pblagoje.github.io/mcp-ollama-python/"
+repository = "https://github.com/pblagoje/mcp-ollama-python"
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/pblagoje/mcp-ollama-python/issues"
+"Companion VS Code Extension" = "https://github.com/pblagoje/mcp-ollama-extension"
+"Extension Docs" = "https://pblagoje.github.io/mcp-ollama-extension/"
+"Changelog" = "https://github.com/pblagoje/mcp-ollama-python/blob/main/README.md#changelog"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.15"

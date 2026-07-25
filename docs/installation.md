@@ -15,9 +15,14 @@ That's it. Your MCP client (Windsurf, VS Code, etc.) will start the server autom
 
 ## Configure Your IDE
 
+### VS Code — companion extension (recommended)
+
+Install [MCP Ollama Manager](https://marketplace.visualstudio.com/items?itemName=internetics.mcp-ollama-extension), then start the server from the Command Palette.  
+See [Companion VS Code Extension](companion-extension.md) and [VS Code Integration](vscode.md).
+
 ### Windsurf
 
-Add to **`%USERPROFILE%\.codeium\windsurf\mcp_config.json`** (Windows) or **`~/.codeium/windsurf/mcp_config.json`** (macOS/Linux):
+Add to **`%USERPROFILE%\.codeium\windsurf\mcp_config.json`** (Windows) or **`~/.codeium\windsurf\mcp_config.json`** (macOS/Linux):
 
 ```json
 {
@@ -35,7 +40,7 @@ Restart Windsurf — the Ollama MCP server will appear in the MCP panel.
 
 See the full [Windsurf Integration](windsurf.md) guide for advanced setup.
 
-### VS Code
+### VS Code / Cursor — MCP JSON only
 
 Add to your MCP settings:
 

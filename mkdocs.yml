@@ -56,6 +56,7 @@ nav:
   - Integrations:
       - Windsurf: windsurf.md
       - VS Code: vscode.md
+      - Companion Extension: companion-extension.md
   - Server Management:
       - Server Control: SERVER_CONTROL.md
       - Interactive Manager: mcp_interactive.md
