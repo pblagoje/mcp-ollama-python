@@ -182,3 +182,5 @@ cython_debug/
 /bin
 /tmp
 *.bak
+AGENTS.md
+CLAUDE.md
